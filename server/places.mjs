@@ -43,7 +43,7 @@ export function validatePlace(input, id) {
   const r = input.review;
   if (!r || typeof r.author !== 'string' || r.author.length > 80 || typeof r.comment !== 'string' || r.comment.length > 10000 || !(r.rating === null || (typeof r.rating === 'number' && Number.isFinite(r.rating) && r.rating >= 0 && r.rating <= 5 && Number.isInteger(r.rating*2)))) bad('署名、评价或半星评分格式不正确。');
   out.review = {author:r.author.trim(),rating:r.rating,comment:r.comment};
-  if (!Array.isArray(input.photos) || input.photos.length > 20) bad('每个地点最多 20 张照片。');
+  if (!Array.isArray(input.photos) || input.photos.length > 15) bad('每个地点最多 15 张照片。');
   out.photos = input.photos.map(p => {
     if (!p || !(asset(p.src) || photoID(p.src))) bad('照片必须来自本站相册。');
     const result = {src:p.src};

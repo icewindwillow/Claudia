@@ -553,7 +553,128 @@
       ],
       "description": "",
       "date": "2026-07-05",
-      "photos": [],
+      "photos": [
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/615dd0937faaa06b-9bf3bf84.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/615dd0937faaa06b-9bf3bf84-thumb.jpg",
+          "alt": "意式花园与主立面",
+          "caption": "意式花园与主立面：视线穿过几何对称的黄杨木树篱，正对庄园的金色石墙与正门立面。",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/8b1f0efff72cec53-174fa68d.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/8b1f0efff72cec53-174fa68d-thumb.jpg",
+          "alt": "宽阔湖面与石桥",
+          "caption": "宽阔湖面与石桥：湖水、树林与远处石桥铺开典型的英式自然风景园林。",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/51ca9acb43cf589f-7951c3d2.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/51ca9acb43cf589f-7951c3d2-thumb.jpg",
+          "alt": "胜利之柱",
+          "caption": "胜利之柱：高耸于开阔的庄园中轴线草地上，远观便能感到它的体量。",
+          "width": 1200,
+          "height": 1600
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/2c4bee65359e4ebd-78b59de9.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/2c4bee65359e4ebd-78b59de9-thumb.jpg",
+          "alt": "水之阶地（Water Terraces）",
+          "caption": "水之阶地（Water Terraces）：层次分明的露天石造水景庭院，是庄园最具标志性的户外景观之一。",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/e4e6fa6d8992ee38-3bcaf1db.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/e4e6fa6d8992ee38-3bcaf1db-thumb.jpg",
+          "alt": "战争壁毯国事厅",
+          "caption": "战争壁毯国事厅：多幅巨型定制壁毯记录第一代马尔巴罗公爵的战争场景。",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/f9028a81952341d2-076180a0.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/f9028a81952341d2-076180a0-thumb.jpg",
+          "alt": "绿色会客厅",
+          "caption": "绿色会客厅：绿色织物、家族肖像与古典家具，共同构成传统的会客空间。",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/4ce40f177d191076-c01205b2.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/4ce40f177d191076-c01205b2-thumb.jpg",
+          "alt": "Willis 管风琴",
+          "caption": "Willis 管风琴：二战期间，寄宿于此的马尔文学院学生曾取走三根小管；多年后，它们随匿名来信归还。",
+          "width": 1200,
+          "height": 1600
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/b33f11cffcfb35fe-8afd72e5.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/b33f11cffcfb35fe-8afd72e5-thumb.jpg",
+          "alt": "长图书馆",
+          "caption": "长图书馆：连排古董书架环绕空间，中心安放安妮女王大理石雕像。",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/6e2e02f29b32d228-fb311c15.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/6e2e02f29b32d228-fb311c15-thumb.jpg",
+          "alt": "礼拜堂与公爵墓碑",
+          "caption": "礼拜堂与公爵墓碑：庄园内部的独立礼拜堂，白色大理石公爵墓碑立于高窗之下。",
+          "width": 1200,
+          "height": 1600
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/399298600d66c1f1-e89a2a0d.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/399298600d66c1f1-e89a2a0d-thumb.jpg",
+          "alt": "专题展厅入口",
+          "caption": "专题展厅入口：门廊与历史照片引导游客进入温斯顿·丘吉尔的专题展区。",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/42c03f3809c63d21-c508fad5.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/42c03f3809c63d21-c508fad5-thumb.jpg",
+          "alt": "丘吉尔家族餐桌",
+          "caption": "丘吉尔家族餐桌：长桌上摆放着整齐餐具，直观还原当时的历史生活场景。",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/dde6d9aaa2b0457c-f0bb7da3.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/dde6d9aaa2b0457c-f0bb7da3-thumb.jpg",
+          "alt": "印度房间",
+          "caption": "印度房间：1826年定制异域风情壁画，温斯顿·丘吉尔生前非常喜爱在其中放松与作画。",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/ce21f4280136991e-0e8ab606.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/ce21f4280136991e-0e8ab606-thumb.jpg",
+          "alt": "厨房铜锅展示墙",
+          "caption": "厨房铜锅展示墙：一整面墙挂满各个尺寸的铜制厨具，反映庄园曾有的庞大餐饮需求与后勤规模。",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/3d6d102f0c0df9df-afb8663c.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/3d6d102f0c0df9df-afb8663c-thumb.jpg",
+          "alt": "仆人呼叫铃",
+          "caption": "仆人呼叫铃：十六枚铃铛对应不同房间，墙上的时钟与号码让后勤人员一眼读懂召唤来自何处。",
+          "width": 1600,
+          "height": 1200
+        },
+        {
+          "src": "./assets/photos/blenheim-palace/import-20260922/35c3427053f8d4f5-9cbad948.jpg",
+          "thumbnail": "./assets/photos/blenheim-palace/import-20260922/35c3427053f8d4f5-9cbad948-thumb.jpg",
+          "alt": "地下拱顶酒窖",
+          "caption": "地下拱顶酒窖：纯石砌的地下酒窖通道，展示庄园建筑最基础和朴素的一面。",
+          "width": 1600,
+          "height": 1200
+        }
+      ],
       "review": {
         "author": "",
         "rating": null,

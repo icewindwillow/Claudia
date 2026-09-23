@@ -5,7 +5,7 @@ import {project,unproject,featurePath,mergeMemories,photosOf} from './geo.v0.5.j
 import {StreetMap,readStreetConfig} from './streets.v0.4.js';
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 let base=[],records=[],selected=null,current=null,photos=[],csrf='',busy=false,dirty=false,ready=false;
-const fields={place:'place-name',placeEn:'place-en',region:'region',category:'category',locationLabel:'address',date:'trip-date',description:'description',city:'city',officialIntroduction:'official-introduction',officialSource:'official-source'};
+const fields={place:'place-name',placeEn:'place-en',region:'region',category:'category',locationLabel:'address',date:'trip-date',description:'description',city:'city',officialIntroduction:'official-introduction'};
 let searching=false;
 function searchControls(){for(const id of ['location-query','location-search-button'])$(id).disabled=!ready||busy||searching;for(const b of $('location-results').querySelectorAll('button'))b.disabled=!ready||busy||searching;}
 function useResult(result,asNew){
@@ -138,7 +138,7 @@ async function compress(file){
 }
 $('photos').addEventListener('change',async e=>{
   const files=[...e.target.files];e.target.value='';if(!files.length||busy)return;
-  if(photos.length+files.length>20){message('每个地点最多 20 张照片，请减少本次选择的数量。',true);return;}
+  if(photos.length+files.length>15){message('每个地点最多 15 张照片，请减少本次选择的数量。',true);return;}
   lock(true);
   try{for(let i=0;i<files.length;i++){message(`正在压缩并上传照片 ${i+1}/${files.length}…`);const p=await compress(files[i]);const result=await api('/author/api/photo',{data:p.data});photos.push({...result.photo,width:p.width,height:p.height,caption:'',alt:''});dirty=true;renderPhotos();}message('照片已上传为私有素材。请保存草稿或发布地点，完成相册保存。');}
   catch(e){message(e.message+' 已完成的照片保留在当前相册，请保存草稿。',true);}finally{lock(false);ratingUI();}
