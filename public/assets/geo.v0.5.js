@@ -15,7 +15,7 @@ export function validateMemories(data, demos=false) {
   return data.memories.map(m => {
     if (!m || typeof m.id!=='string' || !m.id.trim() || ids.has(m.id) || typeof m.title!=='string' || !m.title.trim()) throw new Error('故事 id 必须唯一，id 和 title 不能为空。');
     ids.add(m.id);
-    for (const key of ['place','placeEn','placeId','date','description','region','category','photo','photoAlt','locationPrecision','locationLabel']) {
+    for (const key of ['place','placeEn','placeId','date','description','region','category','breed','photo','photoAlt','locationPrecision','locationLabel']) {
       if(m[key]!=null && typeof m[key]!=='string') throw new Error(`故事 ${m.id} 的 ${key} 必须是文字。`);
     }
     if(m.coordinates!=null && !validCoordinates(m.coordinates)) throw new Error(`故事 ${m.id} 的坐标格式错误，请使用 [经度, 纬度]。`);
@@ -41,7 +41,7 @@ export function validateMemories(data, demos=false) {
 }
 export function filterMemories(items, region='all', query='') {
   const q=query.trim().toLocaleLowerCase();
-  return items.filter(m=>(region==='all'||m.region===region)&&(!q||[m.title,m.place,m.placeEn,m.description,m.category,m.city,m.locationLabel,m.review?.comment,...(m.aliases||[]),REGIONS[m.region]].filter(Boolean).join(' ').toLocaleLowerCase().includes(q)));
+  return items.filter(m=>(region==='all'||m.region===region)&&(!q||[m.title,m.place,m.placeEn,m.description,m.category,m.breed,m.city,m.locationLabel,m.review?.comment,...(m.aliases||[]),REGIONS[m.region]].filter(Boolean).join(' ').toLocaleLowerCase().includes(q)));
 }
 /** Stable greedy clustering in screen pixels. Original coordinates are never altered. */
 export function clusterPoints(items, screen, radius=31) {

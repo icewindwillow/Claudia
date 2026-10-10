@@ -4,7 +4,7 @@ import {project,unproject,featurePath,mergeMemories,photosOf} from './geo.v0.5.j
 import {StreetMap,readStreetConfig} from './streets.v0.4.js';
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 let base=[],records=[],selected=null,current=null,photos=[],csrf='',busy=false,dirty=false,ready=false;
-const fields={place:'place-name',placeEn:'place-en',region:'region',category:'category',lifeStatus:'life-status',locationLabel:'address',date:'trip-date',description:'description',city:'city',officialIntroduction:'official-introduction'};
+const fields={place:'place-name',placeEn:'place-en',region:'region',breed:'breed',category:'category',lifeStatus:'life-status',locationLabel:'address',date:'trip-date',description:'description',city:'city',officialIntroduction:'official-introduction'};
 let searching=false;
 function searchControls(){for(const id of ['location-query','location-search-button'])$(id).disabled=!ready||busy||searching;for(const b of $('location-results').querySelectorAll('button'))b.disabled=!ready||busy||searching;}
 function useResult(result,asNew){
@@ -99,7 +99,7 @@ async function load(){
     message('已连接云端。可以新增猫咪、定位遇见位置，并保存草稿或发布。');
   }catch(e){message(e.message,true);}finally{lock(false);}
 }
-function createPlace(){select('place-'+crypto.randomUUID(),{place:'',title:'',region:'chongqing',coordinates:null,photos:[],review:{author:'竹喵',rating:null,comment:''}});dirty=true;$('location-query').focus();message('请先定位遇见位置，位置会自动填写，再填写猫咪名字。');}
+function createPlace(){select('place-'+crypto.randomUUID(),{place:'',title:'',region:'chongqing',breed:'',coordinates:null,photos:[],review:{author:'竹喵',rating:null,comment:''}});dirty=true;$('location-query').focus();message('先搜索或点选遇见位置，再填写猫咪名字和品种。');}
 async function save(action){
   if(busy||!ready)return;
   if(action!=='discard-draft'&&!point()){message('请先定位遇见位置，或在地图上点选位置。',true);$('location-query').focus();return;}

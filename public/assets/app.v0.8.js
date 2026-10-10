@@ -4,6 +4,7 @@ import {OVERVIEW_MAX_ZOOM,clusterBounds,coincident} from './cluster-view.v0.6.js
 import {StreetMap, GeoBounds, readStreetConfig} from './streets.v0.4.js';
 import {MAP_BOUNDS,REGIONS,project,unproject,validateMemories,filterMemories,clusterPoints,featurePath,validRating,starFills,photosOf,mergeMemories,publishableMemories} from './geo.v0.5.js';
 import {sortMemories} from './collection.v0.5.js';
+import {breedIcon} from './cat-breeds.v0.1.js';
 
 const $=id=>document.getElementById(id);
 const svgNS='http://www.w3.org/2000/svg';
@@ -122,6 +123,7 @@ function screenPoint(coords){if(state.online&&streetMap){const p=streetMap.proje
 function renderOverlays(){
   if(!atlas?.width)return;
   const w=atlas.width,h=atlas.height,zoomRatio=atlas.camera.s/atlas.base;
+  const breedZoom=state.online?(streetMap?.getZoom()||0)>=14:zoomRatio>=2.1;
   const labelBoxes=[];labelData.forEach((d,i)=>{const el=labelEls[i],p=atlas.screen(d.point);const width=Math.min(120,d.zh.length*12),box={x:p[0]-width/2,y:p[1]-9,w:width,h:18};const overlap=labelBoxes.some(b=>box.x<b.x+b.w+6&&box.x+box.w+6>b.x&&box.y<b.y+b.h+4&&box.y+box.h+4>b.y);el.style.left=`${p[0]}px`;el.style.top=`${p[1]}px`;el.hidden=state.online||p[0]<0||p[0]>w||p[1]<10||p[1]>h-25||zoomRatio>10||overlap;if(!el.hidden)labelBoxes.push(box);el.style.opacity='1';});
   const groups=clusterPoints(state.filtered,screenPoint,small()?29:31);
   const allPins=groups.map(g=>({x:g.x-14,y:g.y-14,w:28,h:28}));
@@ -139,7 +141,7 @@ function renderOverlays(){
     }
     el._items=g.items;el.style.left=`${g.x}px`;el.style.top=`${g.y}px`;el.classList.toggle('cluster',ids.length>1);el.classList.toggle('is-selected',ids.includes(state.selected?.id));
     el.setAttribute('aria-label',ids.length>1?`展开 ${ids.length} 只猫咪：${g.items.map(m=>m.place).join('、')}`:`${g.items[0].place||g.items[0].title}，${g.items[0].demo?'演示猫咪':'查看猫咪记录'}`);
-    const dot=el.querySelector('.pin-dot');dot.replaceChildren();el.dataset.ratingTone=ids.length===1?ratingTone(g.items[0].review?.rating):'unrated';if(ids.length>1)dot.textContent=String(ids.length);else{dot.append(categoryIcon(g.items[0].category));el.setAttribute('aria-label',`${g.items[0].place}，${categoryOf(g.items[0].category)}，${g.items[0].review?.rating==null?'尚未评分':g.items[0].review.rating+' 星'}，查看猫咪记录`);}
+    const dot=el.querySelector('.pin-dot');dot.replaceChildren();dot.classList.remove('breed-pin');el.dataset.ratingTone=ids.length===1?ratingTone(g.items[0].review?.rating):'unrated';if(ids.length>1)dot.textContent=String(ids.length);else{const breed=breedZoom&&breedIcon(g.items[0].breed);if(breed){dot.classList.add('breed-pin');dot.append(breed);}else dot.append(categoryIcon(g.items[0].category));el.setAttribute('aria-label',`${g.items[0].place}，${g.items[0].breed||'品种未知'}，${categoryOf(g.items[0].category)}，${g.items[0].review?.rating==null?'尚未评分':g.items[0].review.rating+' 星'}，查看猫咪记录`);}
     const label=el.querySelector('.pin-label');label.replaceChildren(text('span','',ids.length>1?`${ids.length} 只猫咪`:(g.items[0].place||g.items[0].title)));
     if(ids.length===1&&g.items[0].placeEn)label.append(text('small','',g.items[0].placeEn));
     const labelW=label.offsetWidth||100,labelH=label.offsetHeight||28;
@@ -180,7 +182,7 @@ function refreshCollection(){
     const row=text('button','memory-row');row.type='button';row.dataset.id=m.id;row.dataset.category=categoryOf(m.category);row.dataset.ratingTone=ratingTone(m.review?.rating);row.setAttribute('aria-pressed',String(state.selected?.id===m.id));
     const photos=photosOf(m);
     if(photos.length){const thumb=document.createElement('img');thumb.className='row-photo';thumb.src=photoSrc(photos[0].thumbnail||photos[0].src);thumb.alt='';thumb.loading='lazy';row.append(thumb);}else {const mark=text('span','row-category-mark');mark.append(categoryIcon(m.category));row.append(mark);}
-    const body=text('span','row-body');const title=text('span','row-title');title.append(text('strong','',m.place||'猫咪名字待补'));if(m.placeEn)title.append(text('small','',m.placeEn));body.append(title,text('span','row-sub',[m.city||'',m.category,m.lifeStatus&&m.lifeStatus!=='在世'?m.lifeStatus:'',m.demo?'演示':m.date,!m.coordinates?'定位待补':''].filter(Boolean).join(' · ')));
+    const body=text('span','row-body');const title=text('span','row-title');title.append(text('strong','',m.place||'猫咪名字待补'));if(m.placeEn)title.append(text('small','',m.placeEn));body.append(title,text('span','row-sub',[m.breed||'品种未知',m.city||'',m.category,m.lifeStatus&&m.lifeStatus!=='在世'?m.lifeStatus:'',m.demo?'演示':m.date,!m.coordinates?'定位待补':''].filter(Boolean).join(' · ')));
     body.querySelector('.row-sub').prepend(categoryIcon(m.category));
     if(m.review||photos.length){const meta=text('span','row-review');if(m.review){const rating=text('span','rating-display');renderRating(rating,m.review.rating,{compact:true});meta.append(rating);}if(photos.length)meta.append(text('span','row-photo-count',`${photos.length} 张照片`));body.append(meta);}row.append(body);const arrow=icon('arrow');arrow.classList.add('row-arrow');row.append(arrow);row.addEventListener('click',()=>openStory(m,row));f.append(row);
   });
@@ -208,7 +210,7 @@ function openStory(m,trigger=null){
   if(trigger)lastFocus=trigger;else if(!panel.open)lastFocus=document.activeElement;
   $('story-kind').textContent=m.demo?'DEMO POSTCARD / 演示卡片':'猫咪相册';
   $('story-category').replaceChildren(categoryIcon(m.category),document.createTextNode(categoryOf(m.category)));
-  $('story-region').textContent=[m.locationLabel||'遇见位置待补',m.category,m.lifeStatus&&m.lifeStatus!=='在世'?m.lifeStatus:'',(m.visitDates?.length?m.visitDates.join(' · '):m.date)].filter(Boolean).join(' · ');
+  $('story-region').textContent=[m.breed||'品种未知',m.locationLabel||'遇见位置待补',m.category,m.lifeStatus&&m.lifeStatus!=='在世'?m.lifeStatus:'',(m.visitDates?.length?m.visitDates.join(' · '):m.date)].filter(Boolean).join(' · ');
   $('story-place').replaceChildren(document.createTextNode(m.place||'猫咪名字待补'));if(m.placeEn)$('story-place').append(text('small','',m.placeEn));
   $('story-writing').hidden=!m.description;$('read-long-review').hidden=!m.description;$('story-scroll').scrollTop=0;$('story-title').hidden=!m.title||m.title===m.place;
   $('story-title').textContent=m.title;$('story-description').textContent=m.description||'';
