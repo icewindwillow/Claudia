@@ -33,6 +33,20 @@ function normalizeAmap(data){
   if(!data||data.status!=='1'||!Array.isArray(data.geocodes))return [];
   return normalizeResults({features:data.geocodes.map(x=>{const [lon,lat]=String(x.location||'').split(',').map(Number);const name=(typeof x.building?.name==='string'&&x.building.name)||(typeof x.neighborhood?.name==='string'&&x.neighborhood.name)||String(x.formatted_address||'').split(/[，,]/)[0];return {geometry:{type:'Point',coordinates:[lon,lat]},properties:{name,address:x.formatted_address,city:x.city||'重庆',district:x.district,countrycode:'CN'}}})});
 }
+
+async function fetchJson(fetcher,url,options,code='SEARCH_UNAVAILABLE'){
+  try{
+    const response=await fetcher(url,options);
+    if(!response.ok)return {response:null,data:null};
+    try{return {response,data:await response.json()};}
+    catch{return {response,data:null};}
+  }catch(error){
+    // Upstream outages are expected during a read-only search. Keep them
+    // local to this provider so another provider can still answer.
+    console.warn('[search-upstream]',code,error?.name||'error');
+    return {response:null,data:null};
+  }
+}
 export async function searchPlaces(env,body,{fetcher=fetch}={}){
   const {query,upstreamQuery}=searchQuery(body?.query),db=dbOf(env);
   // Explicit authenticated searches only; never forward tokens, emails or story data.
@@ -46,17 +60,33 @@ export async function searchPlaces(env,body,{fetcher=fetch}={}){
   const lease=await db.prepare("INSERT INTO place_search_gate (id,owner,next_at) VALUES (1,?,CAST(strftime('%s','now') AS INTEGER)+30) ON CONFLICT(id) DO UPDATE SET owner=excluded.owner,next_at=excluded.next_at WHERE place_search_gate.next_at<=CAST(strftime('%s','now') AS INTEGER) RETURNING id").bind(owner).first();
   if(!lease)throw new HttpError(429,'SEARCH_BUSY','搜索稍忙，请等待几秒后再点击搜索。');
   try{
-    const url=new URL('https://photon.komoot.io/api/');url.search=new URLSearchParams({q:upstreamQuery,limit:'20',lang:'zh',bbox:'105.2,28.1,110.3,32.3'}).toString();
-    let response;
-    try{response=await fetcher(url.href,{headers:{Accept:'application/json','User-Agent':'ClaudiaCatMap/1.0 (+https://github.com/icewindwillow/Claudia)'},signal:AbortSignal.timeout(12000),redirect:'manual'});}catch{throw new HttpError(502,'SEARCH_UNAVAILABLE','地名服务暂时无法连接，输入已保留。请稍后重试，或用地图选点。');}
-    if(!response.ok)throw new HttpError(response.status===429?429:502,'SEARCH_UNAVAILABLE','地名服务暂时繁忙，请稍后重试。');
-    let data;try{data=await response.json();}catch{throw new HttpError(502,'SEARCH_BAD_RESPONSE','地名服务没有返回有效结果，请稍后重试。');}
-    let results=normalizeResults(data);
-    // AMap is the primary Chinese address source when configured.
-    if(env.AMAP_KEY){const amap=new URL('https://restapi.amap.com/v3/geocode/geo');amap.search=new URLSearchParams({address:query,city:'重庆',output:'JSON',key:String(env.AMAP_KEY)}).toString();try{const ar=await fetcher(amap.href,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(10000),redirect:'manual'});if(ar.ok){const ad=await ar.json(),mapped=normalizeAmap(ad);if(mapped.length)results=mapped;}}catch{}}
+    let results=[];
+    // AMap is the primary Chinese address source when configured. Calling it
+    // first also avoids spending the request budget on an empty Photon result.
+    if(env.AMAP_KEY){
+      const amap=new URL('https://restapi.amap.com/v3/geocode/geo');
+      amap.search=new URLSearchParams({address:query,city:'重庆',output:'JSON',key:String(env.AMAP_KEY)}).toString();
+      const {data}=await fetchJson(fetcher,amap.href,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(10000),redirect:'manual'},'amap');
+      if(data)results=normalizeAmap(data);
+    }
+    const url=new URL('https://photon.komoot.io/api/');
+    url.search=new URLSearchParams({q:upstreamQuery,limit:'20',lang:'zh',bbox:'105.2,28.1,110.3,32.3'}).toString();
+    if(!results.length){
+      const {data}=await fetchJson(fetcher,url.href,{headers:{Accept:'application/json','User-Agent':'ClaudiaCatMap/1.0 (+https://github.com/icewindwillow/Claudia)'},signal:AbortSignal.timeout(10000),redirect:'manual'},'photon');
+      if(data)results=normalizeResults(data);
+    }
     // Photon sometimes misses Chinese street addresses when the city suffix is added.
-    if(!results.length&&upstreamQuery!==query){url.search=new URLSearchParams({q:query,limit:'20',lang:'zh',bbox:'105.2,28.1,110.3,32.3'}).toString();const retry=await fetcher(url.href,{headers:{Accept:'application/json','User-Agent':'ClaudiaCatMap/1.0'},signal:AbortSignal.timeout(12000),redirect:'manual'});if(retry.ok)results=normalizeResults(await retry.json());}
-    if(!results.length){const nom=new URL('https://nominatim.openstreetmap.org/search');nom.search=new URLSearchParams({q:query+' 重庆',format:'jsonv2',limit:'10',countrycodes:'cn',viewbox:'105.2,32.3,110.3,28.1',bounded:'1','accept-language':'zh-CN'}).toString();try{const retry=await fetcher(nom.href,{headers:{Accept:'application/json','User-Agent':'ClaudiaCatMap/1.0 (+https://github.com/icewindwillow/Claudia)'},signal:AbortSignal.timeout(12000),redirect:'manual'});if(retry.ok)results=normalizeNominatim(await retry.json());}catch{}}
+    if(!results.length&&upstreamQuery!==query){
+      url.search=new URLSearchParams({q:query,limit:'20',lang:'zh',bbox:'105.2,28.1,110.3,32.3'}).toString();
+      const {data}=await fetchJson(fetcher,url.href,{headers:{Accept:'application/json','User-Agent':'ClaudiaCatMap/1.0'},signal:AbortSignal.timeout(10000),redirect:'manual'},'photon-retry');
+      if(data)results=normalizeResults(data);
+    }
+    if(!results.length){
+      const nom=new URL('https://nominatim.openstreetmap.org/search');
+      nom.search=new URLSearchParams({q:query+' 重庆',format:'jsonv2',limit:'10',countrycodes:'cn',viewbox:'105.2,32.3,110.3,28.1',bounded:'1','accept-language':'zh-CN'}).toString();
+      const {data}=await fetchJson(fetcher,nom.href,{headers:{Accept:'application/json','User-Agent':'ClaudiaCatMap/1.0 (+https://github.com/icewindwillow/Claudia)'},signal:AbortSignal.timeout(10000),redirect:'manual'},'nominatim');
+      if(data)results=normalizeNominatim(data);
+    }
     await db.prepare("INSERT INTO place_search_cache (query,results,fetched_at) VALUES (?,?,CAST(strftime('%s','now') AS INTEGER)) ON CONFLICT(query) DO UPDATE SET results=excluded.results,fetched_at=excluded.fetched_at").bind(key,JSON.stringify(results)).run();
     return {query,upstreamQuery,results,cached:false};
   }finally{await db.prepare("UPDATE place_search_gate SET next_at=CAST(strftime('%s','now') AS INTEGER)+2 WHERE id=1 AND owner=?").bind(owner).run();}
