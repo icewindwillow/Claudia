@@ -135,11 +135,38 @@ async function compress(file){
     throw new Error('这张照片压缩后仍过大，请先缩小图片再上传。');
   }finally{URL.revokeObjectURL(url);}
 }
+// Read GPS before canvas compression (canvas intentionally removes EXIF metadata).
+async function readPhotoGps(file){
+  if(file.type!=='image/jpeg')return null;
+  const buf=await file.arrayBuffer(),view=new DataView(buf);
+  if(view.getUint16(0)!==0xffd8)return null;
+  let p=2;
+  while(p+4<view.byteLength){
+    if(view.getUint8(p)!==0xff){p++;continue;}
+    const marker=view.getUint8(p+1);p+=2;
+    if(marker===0xda||marker===0xd9)break;
+    const len=view.getUint16(p);if(marker===0xe1&&view.getUint32(p+2)===0x45786966&&view.getUint16(p+6)===0){
+      const t=p+10,little=view.getUint16(t)===0x4949, u16=(o)=>view.getUint16(t+o,little),u32=(o)=>view.getUint32(t+o,little);
+      const ifd=t+u32(4),n=u16(ifd),tags={};
+      for(let i=0;i<n;i++){const q=ifd+2+i*12;tags[u16(q)]=q;}
+      const gps=tags[0x8825];if(!gps)return null;const go=t+u32(gps+8),gn=u16(go),g={};
+      for(let i=0;i<gn;i++){const q=go+2+i*12;g[u16(q)]=q;}
+      const text=(q)=>String.fromCharCode(...new Uint8Array(buf,t+u32(q+8),Math.max(0,u32(q+4)-1)));
+      const rat=(q)=>{const o=t+u32(q+8);return view.getUint32(o,little)/view.getUint32(o+4,little)};
+      if(!g[1]||!g[2]||!g[3]||!g[4])return null;
+      const o=t+u32(g[2]+8),v=[rat(o),rat(o+8),rat(o+16)];let lat=v[0]+v[1]/60+v[2]/3600;
+      const oo=t+u32(g[4]+8),w=[rat(oo),rat(oo+8),rat(oo+16)];let lon=w[0]+w[1]/60+w[2]/3600;
+      if(text(g[1])==='S')lat=-lat;if(text(g[3])==='W')lon=-lon;
+      return [lon,lat];
+    }
+    p+=len;
+  }return null;
+}
 $('photos').addEventListener('change',async e=>{
   const files=[...e.target.files];e.target.value='';if(!files.length||busy)return;
   if(photos.length+files.length>15){message('每个地点最多 15 张照片，请减少本次选择的数量。',true);return;}
   lock(true);
-  try{for(let i=0;i<files.length;i++){message(`正在压缩并上传照片 ${i+1}/${files.length}…`);const p=await compress(files[i]);const result=await api('/author/api/photo',{data:p.data});photos.push({...result.photo,width:p.width,height:p.height,caption:'',alt:''});dirty=true;renderPhotos();}message('照片已上传为私有素材。请保存草稿或发布地点，完成相册保存。');}
+  try{for(let i=0;i<files.length;i++){message(`正在读取照片 ${i+1}/${files.length}…`);const gps=await readPhotoGps(files[i]);if(gps&&gps[0]>=105.2&&gps[0]<=110.3&&gps[1]>=28.1&&gps[1]<=32.3){$('longitude').value=gps[0].toFixed(6);$('latitude').value=gps[1].toFixed(6);$('region').value='chongqing';$('city').value='重庆市';$('address').value=`照片 GPS：${gps[1].toFixed(5)}，${gps[0].toFixed(5)}`;current.locationPrecision='照片 EXIF GPS';current.coordinateSource={name:'照片 EXIF GPS'};dirty=true;drawPins();message('已从照片 EXIF 读取重庆位置，正在上传照片…');}const p=await compress(files[i]);const result=await api('/author/api/photo',{data:p.data});photos.push({...result.photo,width:p.width,height:p.height,caption:'',alt:''});dirty=true;renderPhotos();}message('照片已上传。若含 GPS，重庆地区和坐标已自动填写；请核对后保存或发布。');}
   catch(e){message(e.message+' 已完成的照片保留在当前相册，请保存草稿。',true);}finally{lock(false);ratingUI();}
 });
 $('place-form').addEventListener('input',()=>{dirty=true;ratingUI();categoryUI();reviewCounts();drawPins();});

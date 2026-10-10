@@ -40,6 +40,8 @@ body.author-desk{--white:#171e1a;background:#0c100f;color:var(--ink);padding-bot
  .author-desk .desk-shell{padding:20px 12px}
  .author-desk .desk-heading{align-items:flex-start;flex-direction:column}
  .author-desk .workspace{display:flex;flex-direction:column;height:auto;min-height:0;gap:16px}
+ .author-desk .editing-sheet{order:-1}
+ .author-desk #photos-section{order:-1}
  .author-desk .map-column{position:static;max-height:none;overflow:visible;padding:0;gap:12px}
  .author-desk .place-toolbar{display:grid;grid-template-columns:1fr 1fr}
  .author-desk .place-toolbar label,.author-desk .place-toolbar select{grid-column:1/-1;width:100%;max-width:none}
