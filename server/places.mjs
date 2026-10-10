@@ -31,14 +31,14 @@ export function validatePlace(input, id) {
   if(out.officialSource){let url;try{url=new URL(out.officialSource);}catch{bad('官方来源须为有效 HTTPS 链接。');}if(url.protocol!=='https:'||url.username||url.password)bad('官方来源须为 HTTPS 链接。');}
   if (!out.place) bad('请填写地点名称。');
   out.title ||= out.place;
-  if (!['england','scotland','wales','northernIreland'].includes(out.region)) bad('请选择所属地区。');
+  if (!['chongqing'].includes(out.region)) bad('请选择所属地区。');
   if (out.date && (!/^\d{4}-\d{2}-\d{2}$/.test(out.date) || !Number.isFinite(Date.parse(out.date)) || new Date(out.date).toISOString().slice(0,10) !== out.date)) bad('旅行日期不正确。');
   const c = input.coordinates;
   if (input.visitDates != null) {
     if (!Array.isArray(input.visitDates) || input.visitDates.length > 100 || !input.visitDates.every(d => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d) && Number.isFinite(Date.parse(d)) && new Date(d).toISOString().slice(0,10) === d)) bad('其他到访日期请使用 YYYY-MM-DD，用逗号分隔。');
     out.visitDates = [...new Set([out.date, ...input.visitDates].filter(Boolean))].sort();
   }
-  if (!Array.isArray(c) || c.length !== 2 || !c.every(Number.isFinite) || c[0] < -15 || c[0] > 12 || c[1] < 46 || c[1] > 65) bad('请在英国及周边地图范围内选择坐标（经度 -15～12，纬度 46～65）。');
+  if (!Array.isArray(c) || c.length !== 2 || !c.every(Number.isFinite) || c[0] < 105.2 || c[0] > 110.3 || c[1] < 28.1 || c[1] > 32.3) bad('请在重庆地图范围内选择坐标（经度 105.2～110.3，纬度 28.1～32.3）。');
   out.coordinates = [...c];
   const r = input.review;
   if (!r || typeof r.author !== 'string' || r.author.length > 80 || typeof r.comment !== 'string' || r.comment.length > 10000 || !(r.rating === null || (typeof r.rating === 'number' && Number.isFinite(r.rating) && r.rating >= 0 && r.rating <= 5 && Number.isInteger(r.rating*2)))) bad('署名、评价或半星评分格式不正确。');

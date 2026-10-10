@@ -13,4 +13,4 @@ const paths={
  '展览':'M3 5h18v13H3V5Zm5 13-2 4m10-4 2 4M7 14l4-5 3 3 3-2',
  '未分类':'M18 10c0 5-6 11-6 11S6 15 6 10a6 6 0 1 1 12 0Zm-4 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0'
 };
-export function categoryIcon(value){const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('class','category-icon');svg.setAttribute('aria-hidden','true');const path=document.createElementNS(ns,'path');path.setAttribute('d',paths[categoryOf(value)]);svg.append(path);return svg;}
+export function categoryIcon(value){const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('class','category-icon');svg.setAttribute('aria-hidden','true');const path=document.createElementNS(ns,'path');path.setAttribute('d',paths[categoryOf(value)]||paths['未分类']);svg.append(path);return svg;}

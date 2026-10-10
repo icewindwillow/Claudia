@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="./assets/collection.v0.9.css">
   <link rel="stylesheet" href="./assets/place-style.v0.6.css">
 <link rel="stylesheet" href="./assets/reviews.v0.7.css">
-<link rel="stylesheet" href="./assets/details.v0.8.css"><link rel="stylesheet" href="./assets/story-layout.v0.8.2.css"><link rel="stylesheet" href="./assets/guest-layout.v0.9.css"><link rel="stylesheet" href="./assets/guest-layout.v0.9.1.css"><link rel="stylesheet" href="./assets/collection.v0.9.2.css"><link rel="stylesheet" href="./assets/collection.v1.0.css"><link rel="stylesheet" href="./assets/collection.v1.1.css"><link rel="stylesheet" href="./assets/collection.v1.2.css"><link rel="stylesheet" href="./assets/collection.v1.2.1.css"><link rel="stylesheet" href="./assets/collection.v1.3.css"></head>
+<link rel="stylesheet" href="./assets/details.v0.8.css"><link rel="stylesheet" href="./assets/story-layout.v0.8.2.css"><link rel="stylesheet" href="./assets/guest-layout.v0.9.css"><link rel="stylesheet" href="./assets/guest-layout.v0.9.1.css"><link rel="stylesheet" href="./assets/collection.v0.9.2.css"><link rel="stylesheet" href="./assets/collection.v1.0.css"><link rel="stylesheet" href="./assets/collection.v1.1.css"><link rel="stylesheet" href="./assets/collection.v1.2.css"><link rel="stylesheet" href="./assets/collection.v1.2.1.css"><link rel="stylesheet" href="./assets/collection.v1.3.css"><link rel="stylesheet" href="./assets/claudia.css"></head>
 <body>
   <svg class="icon-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
@@ -35,55 +35,53 @@
   </defs></svg>
   <a class="skip-link" href="#map-frame">跳到地图</a>
   <header class="site-header">
-    <a class="brand" href="./" aria-label="竹喵的撸猫地图首页"><span class="brand-mark">z<span>.</span></span><span class="brand-copy"><strong>竹喵的撸猫地图</strong><small>A LITTLE ATLAS OF CAT ENCOUNTERS</small></span></a>
-    <div class="header-center"><span class="header-rule"></span><span>把遇见的猫咪，慢慢收好。</span><span class="header-rule"></span></div>
-    <div class="header-actions"><button type="button" class="header-author" id="header-author">作者登录</button><button id="legend-button" class="about-button" type="button"><svg class="icon"><use href="#i-info"/></svg><span>图标与评分</span></button><button id="about-button" class="about-button" type="button"><svg class="icon"><use href="#i-letter"/></svg><span>关于撸猫地图</span></button></div>
+    <a class="brand" href="./" aria-label="竹喵的撸猫地图首页"><span class="brand-mark">z<span>.</span></span><span class="brand-copy"><strong>竹喵的撸猫地图</strong></span></a>
+
+    <div class="header-actions"><button type="button" class="header-author" id="header-author">作者登录</button><button id="legend-button" class="about-button" type="button"><svg class="icon"><use href="#i-info"/></svg><span>图标与评分</span></button><button id="about-button" class="about-button" type="button"><svg class="icon"><use href="#i-letter"/></svg><span>地图说明</span></button></div>
   </header>
   <main class="workspace" id="main">
     <aside class="sidebar" aria-label="地点与故事收藏册">
       <section class="sidebar-intro">
-        <p class="eyebrow"><span class="tiny-star">✳</span> FOR THE CATS WE MEET</p>
-        <h1>有些猫咪，<br>值得<span>再见一面。</span></h1>
-        <p class="intro-description">把遇见的猫咪、撸猫的地点，<br>和舍不得忘记的小事，慢慢放回地图上。</p>
-        <div class="ledger"><div><strong id="place-count">—</strong><span>示范地点</span></div><i></i><div><strong id="memory-count">00</strong><span>真实故事</span></div><svg class="ledger-icon icon"><use href="#i-book"/></svg></div>
+        <h1>地点列表</h1>
+        <div class="ledger"><div><strong id="place-count">—</strong><span>收录地点</span></div><i></i><div><strong id="memory-count">00</strong><span>已发布地点</span></div><svg class="ledger-icon icon"><use href="#i-book"/></svg></div>
       </section>
       <section class="collection" aria-labelledby="collection-title">
-        <div class="collection-heading"><h2 id="collection-title">地点收藏册</h2><span id="result-count">正在翻开…</span></div>
-        <div class="filter-pair"><label for="region-filter">区域<select id="region-filter" aria-label="所属区域"><option value="all">全部区域</option><option value="england">英格兰</option><option value="scotland">苏格兰</option></select></label><label for="rating-sort">排列<select id="rating-sort" aria-label="排列方式"><option value="default">默认顺序</option><option value="rating-desc">星级从高到低</option><option value="rating-asc">星级从低到高</option></select></label></div>
+        <div class="collection-heading"><h2 id="collection-title">地点收藏册</h2><span id="result-count">加载中…</span></div>
+        <div class="filter-pair"><label for="region-filter">区域<select id="region-filter" aria-label="所属区域"><option value="all">全部区域</option><option value="chongqing">重庆</option></select></label><label for="rating-sort">排列<select id="rating-sort" aria-label="排列方式"><option value="default">默认顺序</option><option value="rating-desc">星级从高到低</option><option value="rating-asc">星级从低到高</option></select></label></div>
         <select id="city-filter" class="visually-hidden-filter" aria-label="所属城市"><option value="all">全部城市</option></select>
-        <select id="category-filter" class="visually-hidden-filter" aria-label="地点分类"><option value="all">全部分类</option><option value="修道院">修道院</option><option value="教堂">教堂</option><option value="墓地">墓地</option><option value="城堡">城堡</option><option value="宫殿">宫殿</option><option value="城市">城市</option><option value="博物馆">博物馆</option><option value="展览">展览</option></select>
+        <select id="category-filter" class="visually-hidden-filter" aria-label="地点分类"><option value="all">全部分类</option><option value="猫咖">猫咖</option><option value="宠物店">宠物店</option><option value="公园">公园</option><option value="街巷">街巷</option><option value="其他">其他</option></select>
         <div class="search-field"><svg class="icon"><use href="#i-search"/></svg><input id="place-search" type="search" autocomplete="off" placeholder="搜索城市、地点或故事" aria-label="搜索已收录的地点和故事"><kbd aria-hidden="true">/</kbd></div>
-        <div class="category-filters" id="category-filters" aria-label="按地点分类"><button type="button" data-category="all" title="全部分类" aria-label="全部分类" aria-pressed="true"><span>✦</span></button><button type="button" data-category="修道院" title="修道院" aria-label="修道院"><span>♜</span></button><button type="button" data-category="教堂" title="教堂" aria-label="教堂"><span>♜</span></button><button type="button" data-category="墓地" title="墓地" aria-label="墓地"><span>✣</span></button><button type="button" data-category="城堡" title="城堡" aria-label="城堡"><span>♜</span></button><button type="button" data-category="宫殿" title="宫殿" aria-label="宫殿"><span>⌂</span></button><button type="button" data-category="城市" title="城市" aria-label="城市"><span>⌖</span></button><button type="button" data-category="博物馆" title="博物馆" aria-label="博物馆"><span>▣</span></button><button type="button" data-category="展览" title="展览" aria-label="展览"><span>▤</span></button></div>
+        <div class="category-filters" id="category-filters" aria-label="按地点分类"><button type="button" data-category="all" aria-label="all" title="all" aria-pressed="true"><span>全部</span></button><button type="button" data-category="猫咖" aria-label="猫咖" title="猫咖" aria-pressed="false"><span>猫咖</span></button><button type="button" data-category="宠物店" aria-label="宠物店" title="宠物店" aria-pressed="false"><span>宠物店</span></button><button type="button" data-category="公园" aria-label="公园" title="公园" aria-pressed="false"><span>公园</span></button><button type="button" data-category="街巷" aria-label="街巷" title="街巷" aria-pressed="false"><span>街巷</span></button><button type="button" data-category="其他" aria-label="其他" title="其他" aria-pressed="false"><span>其他</span></button></div>
         <div class="memory-list" id="memory-list" aria-label="可点开的地点"></div>
         <p class="data-error" id="data-error" role="alert" hidden></p><button type="button" id="retry-data" class="link-button" hidden>重新读取故事 ↻</button>
       </section>
-      <p class="sidebar-footnote">“每次遇见猫咪，都值得留一个坐标。”</p>
+
     </aside>
-    <section class="map-frame" id="map-frame" aria-label="英国互动地图">
+    <section class="map-frame" id="map-frame" aria-label="重庆互动地图">
       <div class="map-surface" id="map-surface">
-        <svg id="atlas-svg" class="atlas-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="英国及周边真实海岸线总览"><g id="geographic-layer"></g></svg>
+        <svg id="atlas-svg" class="atlas-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="重庆区县总览"><g id="geographic-layer"></g></svg>
         <div class="online-map" id="online-map" aria-label="在线街道地图" hidden></div>
         <div class="labels-layer" id="labels-layer" aria-hidden="true"></div>
         <div class="marker-layer" id="marker-layer" aria-label="地图上的故事地点"></div>
       </div>
       <div class="map-grain" aria-hidden="true"></div>
-      <div class="map-caption"><span class="eyebrow">THE BRITISH CHAPTER</span><span id="map-context">英国全览 <i>／</i> 每个坐标，都等着一个故事</span></div>
-      <div class="map-style-switch" aria-label="底图模式"><button id="overview-button" type="button" aria-pressed="true"><svg class="icon"><use href="#i-map"/></svg>手账总览</button><button id="street-button" type="button" aria-pressed="false"><svg class="icon"><use href="#i-grid"/></svg>街道底图</button></div>
+      <div class="map-caption"><span class="eyebrow">CHONGQING</span><span id="map-context">重庆全览 <i>／</i> 猫咪地点</span></div>
+      <div class="map-style-switch" aria-label="底图模式"><button id="overview-button" type="button" aria-pressed="true"><svg class="icon"><use href="#i-map"/></svg>区县总览</button><button id="street-button" type="button" aria-pressed="false"><svg class="icon"><use href="#i-grid"/></svg>街道底图</button></div>
       <div class="compass" aria-hidden="true"><span>N</span><svg viewBox="0 0 52 62"><path d="M26 7 36 49 26 41 16 49Z" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M26 7v34l10 8Z" fill="currentColor"/><path d="M8 33h36M26 0v4M26 53v9" stroke="currentColor" stroke-width=".7"/><circle cx="26" cy="33" r="19" fill="none" stroke="currentColor" stroke-width=".5"/></svg></div>
-      <div class="map-controls" aria-label="地图操作"><button id="zoom-in" type="button" aria-label="放大地图" title="放大地图">＋</button><button id="zoom-out" type="button" aria-label="缩小地图" title="缩小地图">−</button><span></span><button id="reset-map" type="button" aria-label="回到英国全览" title="回到英国全览"><svg class="icon"><use href="#i-reset"/></svg></button></div>
-      <div class="map-dedication" id="map-dedication" aria-hidden="true"><span class="dedication-line"></span><p>Some places stay<br><em>with us.</em></p><small>留给那些，不想忘记的日子。</small></div>
+      <div class="map-controls" aria-label="地图操作"><button id="zoom-in" type="button" aria-label="放大地图" title="放大地图">＋</button><button id="zoom-out" type="button" aria-label="缩小地图" title="缩小地图">−</button><span></span><button id="reset-map" type="button" aria-label="回到重庆全览" title="回到重庆全览"><svg class="icon"><use href="#i-reset"/></svg></button></div>
+      <div id="map-dedication" hidden></div>
       <div class="map-key"><span class="key-dot"></span><span id="map-key-label">故事地点</span><i></i><span class="map-hint">拖动探索 · 滚轮缩放</span></div>
       <div class="scale-wrap" id="scale-wrap"><span id="scale-text">200 km</span><span class="scale-line" id="scale-line"></span></div>
-      <div class="geo-attribution" id="geo-attribution"><button type="button" id="sources-button">GSHHG 2.3.6 · 简化地理总览 ⓘ</button></div>
+      <div class="geo-attribution" id="geo-attribution"><button type="button" id="sources-button">重庆区县边界 · 数据来源 ⓘ</button></div>
       <div class="street-attribution" id="street-attribution" hidden>© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener">报告地图问题</a></div><button type="button" class="street-retry" id="street-retry" hidden>重试街道图片</button>
       <div class="map-status" id="map-status" role="status" aria-live="polite">正在展开地图…</div>
       <dialog class="story-panel" id="story-panel" aria-labelledby="story-place">
-        <div class="story-head"><span id="story-kind" class="eyebrow">A PLACE TO KEEP / 地点相册</span><button id="close-story" class="story-close" type="button"><span>返回地图</span><svg class="icon"><use href="#i-close"/></svg></button></div>
+        <div class="story-head"><span id="story-kind" class="eyebrow">地点相册</span><button id="close-story" class="story-close" type="button"><span>返回地图</span><svg class="icon"><use href="#i-close"/></svg></button></div>
         <div class="story-scroll" id="story-scroll"><div class="story-layout">
           <div class="story-main"><section class="story-gallery" aria-label="地点照片相册">
             <div class="story-art" id="story-art">
               <button class="photo-open" id="photo-open" type="button" aria-label="放大查看当前照片"><img id="story-photo" alt="" decoding="async"><span class="photo-expand-hint"><svg class="icon"><use href="#i-expand"/></svg>放大照片</span></button>
-              <div class="photo-placeholder" id="photo-placeholder"><svg class="icon"><use href="#i-photo"/></svg><span id="story-art-en">A little memory</span><small id="photo-placeholder-note">这里留给下一张照片。</small></div>
+              <div class="photo-placeholder" id="photo-placeholder"><svg class="icon"><use href="#i-photo"/></svg><span id="story-art-en">暂无照片</span><small id="photo-placeholder-note"></small></div>
               <span class="photo-counter" id="photo-counter" aria-live="polite"></span>
               <button type="button" id="photo-prev" class="photo-arrow photo-arrow-prev" aria-label="上一张照片">‹</button><button type="button" id="photo-next" class="photo-arrow photo-arrow-next" aria-label="下一张照片">›</button>
             </div>
@@ -94,7 +92,7 @@
           <article class="story-writing" id="story-writing" tabindex="-1"><span class="eyebrow">TRAVEL JOURNAL / 作者长评</span><h3 id="story-title"></h3><p id="story-description" class="story-description"></p></article><section class="story-extras" id="official-section"><span class="eyebrow">ABOUT THE PLACE</span><h3>官方介绍</h3><p id="official-text"></p><a id="official-link" target="_blank" rel="noopener noreferrer" hidden>查看官方来源 ↗</a></section></div>
           <div class="story-body"><div class="story-category" id="story-category"></div>
             <p class="story-region" id="story-region"></p><span id="story-city" class="city-tag"></span><h2 id="story-place" tabindex="-1"></h2>
-            <section class="author-review" aria-label="作者评价"><div class="review-heading"><span class="eyebrow">一句短评</span><span id="review-author"></span></div><div id="story-rating" class="rating-display"></div><blockquote id="review-comment"></blockquote><p class="review-empty" id="review-empty" hidden>这个地方的感受，还没有写下。</p></section>
+            <section class="author-review" aria-label="作者评价"><div class="review-heading"><span class="eyebrow">一句短评</span><span id="review-author"></span></div><div id="story-rating" class="rating-display"></div><blockquote id="review-comment"></blockquote><p class="review-empty" id="review-empty" hidden>暂无评价</p></section>
             <div class="story-jumps"><button type="button" id="read-official">官方介绍 ↓</button><button type="button" id="read-guests">游客评价 ↓</button><button type="button" class="read-long-review" id="read-long-review">作者长评 ↓</button></div>
             <div class="story-location"><svg class="icon"><use href="#i-pin"/></svg><span id="story-location"></span></div>
             <p id="story-disclaimer" class="story-disclaimer">仅为交互与排版示例，不代表真实经历。</p>
@@ -107,17 +105,14 @@
       <noscript><div class="no-script">请开启 JavaScript，才能拖动地图和阅读故事。</div></noscript>
     </section>
   </main>
-  <footer class="site-footer"><span>一路遇见猫咪，留下值得收藏的坐标。</span></footer>
+
   <dialog class="legend-dialog" id="legend-dialog" aria-labelledby="legend-title"><div class="dialog-top"><span class="eyebrow">A SMALL KEY / 阅读说明</span><button id="close-legend" class="icon-button" type="button" aria-label="关闭说明"><svg class="icon"><use href="#i-close"/></svg></button></div><h2 id="legend-title">图标与评分色阶</h2><div class="legend-categories" id="legend-categories"></div><div class="legend-ratings"><span data-rating-tone="forest"><i></i>4.5–5 星</span><span data-rating-tone="sage"><i></i>3.5–4 星</span><span data-rating-tone="ochre"><i></i>2–3 星</span><span data-rating-tone="clay"><i></i>0–1.5 星</span><span data-rating-tone="unrated"><i></i>未评分</span></div><p>图标表示地点分类，色阶表示作者评分；数量圆标表示同一区域内的多个地点。</p></dialog>
   <dialog class="about-dialog" id="about-dialog" aria-labelledby="about-title">
-    <div class="dialog-top"><span class="eyebrow">A MAP OF CAT ENCOUNTERS.</span><button id="close-about" class="icon-button" type="button" aria-label="关闭介绍"><svg class="icon"><use href="#i-close"/></svg></button></div>
-    <h2 id="about-title">一张地图，<br>装下与猫咪相遇的日子。</h2>
-    <p>轻轻点开一个地点，翻翻照片，读读竹喵留下的评价，收藏每一次与猫咪的相遇。</p>
-    <div class="about-note"><strong>收藏真实的撸猫记忆。</strong><p>地图展示已收录和发布的地点、照片与评价。搜索仅查本站已收录内容。</p></div>
-    <h3>作者的评价，不是游客投票</h3><p>评分为 0～5 星，支持半星；0 星和未评分分开显示。作者登录后，可以保存云端草稿或发布评价。草稿只对作者可见；公开地图只读取已发布版本。普通访客不能修改云端记录。</p><button type="button" id="about-author" class="author-tool-link">进入作者后台 ↗</button>
-    <h3>两种底图</h3><p><b>手账总览：</b>随网页附带的真实海岸线数据，可拖动、缩放；它经过概括化，不是街道或测绘级地图。陆地颜色不表示国家归属，周边岛屿和国家仅作地理参照。</p><p><b>街道底图：</b>使用真实的 OpenStreetMap 街道图，通过本站接口按需加载。无需外部脚本 CDN 或 WebGL。需要联网；失败会显示具体提示并保留总览。</p>
-    <h3>地图来源与隐私</h3><p>总览：GSHHG 2.3.6 / basemap-data 2.0.0（LGPL-3.0-or-later），海岸线来源与转换脚本随代码提供。街道底图：© OpenStreetMap contributors。仅加载当前可见区域，不提供离线街道下载。</p><p>公开地图不要求登录，不申请设备定位，也不含分析追踪脚本。作者入口使用 Cloudflare Access，身份验证由 Cloudflare 处理；D1 保存评价和操作账户。街道通过本站后端向 OpenStreetMap 取图。公开仓库或公开网址不适合存放私密地址、未获同意的照片；禁止搜索引擎收录不等于访问加密。</p>
-    <p class="source-links"><a href="https://github.com/matplotlib/basemap" target="_blank" rel="noopener noreferrer">总览数据来源 ↗</a><a href="https://operations.osmfoundation.org/policies/tiles/" target="_blank" rel="noopener noreferrer">街道底图来源 ↗</a></p>
+    <div class="dialog-top"><button id="close-about" class="icon-button" type="button" aria-label="关闭说明">×</button></div>
+    <h2 id="about-title">地图说明</h2><p>查看重庆的猫咪地点、照片与评分。作者登录后可新增或编辑地点。</p>
+    <p>区县边界：阿里云 DataV 重庆边界数据，已转换为 WGS84 坐标，仅供概括总览。街道底图：© OpenStreetMap contributors。</p>
+    <p>地点搜索使用 OpenStreetMap / Photon；未收录的地点可在地图上手动选点。地图不请求设备定位。</p>
+    <p><a href="https://geo.datav.aliyun.com/areas_v3/bound/500000_full.json" target="_blank" rel="noopener noreferrer">区县边界来源</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">街道底图来源</a></p><button type="button" id="about-author" class="author-tool-link">进入作者后台 ↗</button>
   </dialog>
 
   <dialog id="photo-viewer" class="photo-viewer" aria-labelledby="viewer-title">

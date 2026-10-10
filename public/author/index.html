@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>地图编辑室 · 竹喵的撸猫地图</title><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/assets/editor.v0.5.2.css"><script type="module" src="/assets/editor.v0.8.js"></script><link rel="stylesheet" href="/assets/place-style.v0.6.css"><link rel="stylesheet" href="/assets/reviews.v0.7.css"><link rel="stylesheet" href="/assets/details.v0.8.css"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>地图编辑室 · 竹喵的撸猫地图</title><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/assets/editor.v0.5.2.css"><script type="module" src="/assets/editor.v0.8.js"></script><link rel="stylesheet" href="/assets/place-style.v0.6.css"><link rel="stylesheet" href="/assets/reviews.v0.7.css"><link rel="stylesheet" href="/assets/details.v0.8.css"><link rel="stylesheet" href="/assets/claudia.css"></head>
 <body>
 <header class="desk-header"><a class="desk-brand" href="/">z. 竹喵的撸猫地图 · 编辑室</a><nav><a href="/" target="_blank" rel="noopener">查看公开地图 ↗</a><a href="/cdn-cgi/access/logout">退出登录</a></nav></header>
 <main class="desk-shell">
@@ -9,16 +9,16 @@
 <nav class="section-nav" aria-label="编辑区快捷导航"><a href="#details-section">01 地点信息</a><a href="#story-section">02 故事与评价</a><a href="#photos-section">03 照片相册</a></nav>
 <div class="workspace">
 <aside class="map-column" id="location-panel"><section class="place-search-panel" aria-labelledby="search-heading">
-<div class="panel-heading"><h2 id="search-heading">查找地点</h2><span>英国地名库</span></div>
+<div class="panel-heading"><h2 id="search-heading">查找地点</h2><span>重庆地名库</span></div>
 <form id="location-search-form"><label for="location-query">城市、景点、餐厅或街道名称</label><div class="search-input-row"><input id="location-query" type="search" minlength="2" maxlength="160" required placeholder="例如：爱丁堡城堡 / Edinburgh Castle" autocomplete="off" disabled><button id="location-search-button" class="button primary" disabled>搜索地名</button></div></form>
-<p class="search-hint">搜索英国地名库，不限于已收录地点。常见中文名可直接搜索；找不到时试试英文名＋城市。</p>
+<p class="search-hint">搜索重庆地名库，不限于已收录地点。输入地点名称；找不到时可在地图上选点。</p>
 <p id="location-search-status" role="status" aria-live="polite"></p><div id="location-results" class="location-results"></div>
 <details class="search-disclosure"><summary>搜索服务与隐私说明</summary><small>点击搜索才会将搜索词发送至 Photon，结果在本站缓存 7 天。请勿输入私人敏感地址。地名数据 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> · 搜索服务 <a href="https://photon.komoot.io" target="_blank" rel="noopener">Photon</a></small></details>
 </section>
 <div class="map-card"><div class="panel-heading"><h2>位置预览</h2><span>搜索后自动定位</span></div>
-<div class="map-toolbar"><button id="overview-mode" class="button" aria-pressed="true">手账总览</button><button id="street-mode" class="button" aria-pressed="false">街道底图</button><button id="focus-pin" class="button">定位当前点</button></div>
-<div id="picker" class="picker" tabindex="0" role="region" aria-label="地点选点地图，点击设置坐标，拖动平移，加减号缩放"><svg id="overview" aria-label="英国地图"><g id="coast"></g><g id="other-pins"></g><circle id="current-pin" r="0.13" hidden></circle></svg><div id="street" hidden></div><span id="street-pin" hidden aria-hidden="true">●</span></div>
-<div class="map-toolbar"><button id="zoom-in" class="button" aria-label="放大地图">＋</button><button id="zoom-out" class="button" aria-label="缩小地图">−</button><button id="map-reset" class="button">英国全览</button><button id="center-pin" class="button">用地图中心作坐标</button></div>
+<div class="map-toolbar"><button id="overview-mode" class="button" aria-pressed="true">区县总览</button><button id="street-mode" class="button" aria-pressed="false">街道底图</button><button id="focus-pin" class="button">定位当前点</button></div>
+<div id="picker" class="picker" tabindex="0" role="region" aria-label="地点选点地图，点击设置坐标，拖动平移，加减号缩放"><svg id="overview" aria-label="重庆地图"><g id="coast"></g><g id="other-pins"></g><circle id="current-pin" r="0.13" hidden></circle></svg><div id="street" hidden></div><span id="street-pin" hidden aria-hidden="true">●</span></div>
+<div class="map-toolbar"><button id="zoom-in" class="button" aria-label="放大地图">＋</button><button id="zoom-out" class="button" aria-label="缩小地图">−</button><button id="map-reset" class="button">重庆全览</button><button id="center-pin" class="button">用地图中心作坐标</button></div>
 <p id="map-status" role="status">点击地图放置图钉；拖动平移，滚轮缩放。也可直接填写经纬度。</p>
 <p id="attribution" hidden>© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a></p>
 </div><section class="published-box"><span id="record-status">未选择地点</span><p id="published-summary"></p><a id="public-link" href="/" target="_blank" rel="noopener">在公开地图中查看 ↗</a></section>
@@ -26,7 +26,7 @@
 <section class="editing-sheet"><form id="place-form" novalidate><fieldset id="fields" disabled>
 <section class="form-section" id="details-section"><div class="section-heading"><span class="step-number">01</span><div><h2>地点信息</h2><p>从右侧搜索地点，或修改已有记录。</p></div><a class="mobile-find" href="#location-panel">查找地点 ↗</a></div>
 <div class="two-col"><div><label for="place-name">地点名称 *</label><input id="place-name" maxlength="160" required placeholder="例如：爱丁堡城堡"></div><div><label for="place-en">英文名称</label><input id="place-en" maxlength="160" placeholder="Edinburgh Castle"></div></div>
-<div class="two-col"><div><label for="region">所属地区 *</label><select id="region" required><option value="">请选择所属地区</option><option value="england">英格兰</option><option value="scotland">苏格兰</option></select></div><div><label for="category">类别</label><select id="category" required><option value="">请选择分类</option><option value="修道院">修道院</option><option value="教堂">教堂</option><option value="墓地">墓地</option><option value="城堡">城堡</option><option value="宫殿">宫殿</option><option value="城市">城市</option><option value="博物馆">博物馆</option><option value="展览">展览</option></select></div></div>
+<div class="two-col"><div><label for="region">所属地区 *</label><select id="region" required><option value="">请选择所属地区</option><option value="chongqing">重庆</option></select></div><div><label for="category">类别</label><select id="category" required><option value="">请选择分类</option><option value="猫咖">猫咖</option><option value="宠物店">宠物店</option><option value="公园">公园</option><option value="街巷">街巷</option><option value="其他">其他</option></select></div></div>
 <div id="category-picker" class="category-picker" role="group" aria-label="快速选择地点分类"></div><p class="field-note">选择分类后，公开地图使用对应图标；保存草稿或发布后生效。旧分类已统一到新的八类。</p><label for="city">所属城市／城镇</label><input id="city" maxlength="120" placeholder="例如：爱丁堡（与地图坐标独立）"><label for="address">位置说明／地址</label><input id="address" maxlength="200" placeholder="城市、街道或地标（此项不会自动定位）">
 <p id="selected-location" class="selected-location">请先搜索并选择地点，也可以在地图上点选。</p>
 <details id="advanced-location"><summary>高级定位：查看／手动填写经纬度（备用）</summary><div class="two-col"><div><label for="longitude">经度（东西方向）*</label><input id="longitude" type="number" step="any" min="-15" max="12" required placeholder="-3.1999"></div><div><label for="latitude">纬度（南北方向）*</label><input id="latitude" type="number" step="any" min="46" max="65" required placeholder="55.9486"></div></div><p class="field-note">搜索选点会自动填写。只有需要校正时才手工修改。</p></details>

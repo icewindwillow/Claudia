@@ -2,7 +2,7 @@ import {showGuests} from './guests.v0.8.js';
 import {normalizeCategory,categoryOf,categoryIcon,ratingTone,CATEGORIES} from './place-style.v0.8.js?v=0.9.2';
 import {OVERVIEW_MAX_ZOOM,clusterBounds,coincident} from './cluster-view.v0.6.js';
 import {StreetMap, GeoBounds, readStreetConfig} from './streets.v0.4.js';
-import {UK_BOUNDS,REGIONS,project,unproject,validateMemories,filterMemories,clusterPoints,featurePath,validRating,starFills,photosOf,mergeMemories,publishableMemories} from './geo.v0.5.js';
+import {MAP_BOUNDS,REGIONS,project,unproject,validateMemories,filterMemories,clusterPoints,featurePath,validRating,starFills,photosOf,mergeMemories,publishableMemories} from './geo.v0.5.js';
 import {sortMemories} from './collection.v0.5.js';
 
 const $=id=>document.getElementById(id);
@@ -52,7 +52,7 @@ class OverviewMap{
     return {s,x:left+(this.width-left-right)/2-(a[0]+b[0])*s/2,y:top+(this.height-top-bottom)/2-(a[1]+b[1])*s/2};
   }
   defaultCamera(){
-    const full=this.cameraFor(UK_BOUNDS,false),zoom=DEFAULT_OVERVIEW_ZOOM;
+    const full=this.cameraFor(MAP_BOUNDS,false),zoom=DEFAULT_OVERVIEW_ZOOM;
     const left=small()?29:68,right=small()?29:78,top=small()?90:88,bottom=small()?62:67;
     const cx=left+(this.width-left-right)/2,cy=top+(this.height-top-bottom)/2;
     return {s:full.s*zoom,x:cx-(cx-full.x)*zoom,y:cy-(cy-full.y)*zoom};
@@ -114,20 +114,7 @@ class OverviewMap{
   }
 }
 
-const labelData=[
-  {point:[-4.35,56.55],zh:'苏格兰',en:'SCOTLAND',kind:'region'},
-  {point:[-1.75,52.8],zh:'英格兰',en:'ENGLAND',kind:'region'},
-  {point:[-8.15,53.2],zh:'爱尔兰',en:'IRELAND',kind:'neighbour'},
-  {point:[-1.15,60.73],zh:'设得兰群岛',en:'Shetland',kind:'island'},
-  {point:[-2.65,59.28],zh:'奥克尼群岛',en:'Orkney',kind:'island'},
-  {point:[-7.2,58.07],zh:'外赫布里底群岛',en:'Outer Hebrides',kind:'island'},
-  {point:[-4.7,54.14],zh:'马恩岛',en:'Isle of Man',kind:'island'},
-  {point:[-10.15,55.9],zh:'NORTH',en:'ATLANTIC OCEAN',kind:'sea'},
-  {point:[1.9,56.35],zh:'NORTH SEA',en:'',kind:'sea'},
-  {point:[.5,48.65],zh:'法国',en:'FRANCE',kind:'neighbour'},
-  {point:[7,59.6],zh:'挪威',en:'NORWAY',kind:'neighbour'},
-  {point:[5.4,52.0],zh:'荷兰',en:'NETHERLANDS',kind:'neighbour'}
-];
+const labelData=[{"point": [108.402235, 30.706367], "zh": "万州区", "en": "", "kind": "region"}, {"point": [107.329521, 29.661157], "zh": "涪陵区", "en": "", "kind": "region"}, {"point": [106.536639, 29.552124], "zh": "渝中区", "en": "", "kind": "region"}, {"point": [106.454674, 29.420225], "zh": "大渡口区", "en": "", "kind": "region"}, {"point": [106.703119, 29.616013], "zh": "江北区", "en": "", "kind": "region"}, {"point": [106.36427, 29.626999], "zh": "沙坪坝区", "en": "", "kind": "region"}, {"point": [106.360442, 29.43112], "zh": "九龙坡区", "en": "", "kind": "region"}, {"point": [106.65682, 29.538362], "zh": "南岸区", "en": "", "kind": "region"}, {"point": [106.510159, 29.863692], "zh": "北碚区", "en": "", "kind": "region"}, {"point": [106.718792, 28.88182], "zh": "綦江区", "en": "", "kind": "region"}, {"point": [105.739079, 29.652698], "zh": "大足区", "en": "", "kind": "region"}, {"point": [106.742921, 29.812866], "zh": "渝北区", "en": "", "kind": "region"}, {"point": [106.747747, 29.374647], "zh": "巴南区", "en": "", "kind": "region"}, {"point": [108.704294, 29.438304], "zh": "黔江区", "en": "", "kind": "region"}, {"point": [107.135534, 29.957136], "zh": "长寿区", "en": "", "kind": "region"}, {"point": [106.259476, 29.032656], "zh": "江津区", "en": "", "kind": "region"}, {"point": [106.307663, 30.115074], "zh": "合川区", "en": "", "kind": "region"}, {"point": [105.869379, 29.293206], "zh": "永川区", "en": "", "kind": "region"}, {"point": [107.167047, 29.13832], "zh": "南川区", "en": "", "kind": "region"}, {"point": [106.188127, 29.564023], "zh": "璧山区", "en": "", "kind": "region"}, {"point": [106.02937, 29.813671], "zh": "铜梁区", "en": "", "kind": "region"}, {"point": [105.811005, 30.146076], "zh": "潼南区", "en": "", "kind": "region"}, {"point": [105.503236, 29.467592], "zh": "荣昌区", "en": "", "kind": "region"}, {"point": [108.378047, 31.273036], "zh": "开州区", "en": "", "kind": "region"}, {"point": [107.714739, 30.660896], "zh": "梁平区", "en": "", "kind": "region"}, {"point": [107.705234, 29.375976], "zh": "武隆区", "en": "", "kind": "region"}, {"point": [108.730584, 31.884007], "zh": "城口县", "en": "", "kind": "region"}, {"point": [107.826542, 29.88748], "zh": "丰都县", "en": "", "kind": "region"}, {"point": [107.433154, 30.25578], "zh": "垫江县", "en": "", "kind": "region"}, {"point": [107.910542, 30.338525], "zh": "忠县", "en": "", "kind": "region"}, {"point": [108.852543, 31.038795], "zh": "云阳县", "en": "", "kind": "region"}, {"point": [109.344665, 30.954517], "zh": "奉节县", "en": "", "kind": "region"}, {"point": [109.896516, 31.117622], "zh": "巫山县", "en": "", "kind": "region"}, {"point": [109.348351, 31.505093], "zh": "巫溪县", "en": "", "kind": "region"}, {"point": [108.294118, 30.096269], "zh": "石柱土家族自治县", "en": "", "kind": "region"}, {"point": [109.013623, 28.495039], "zh": "秀山土家族苗族自治县", "en": "", "kind": "region"}, {"point": [108.796012, 28.903026], "zh": "酉阳土家族苗族自治县", "en": "", "kind": "region"}, {"point": [108.262014, 29.35674], "zh": "彭水苗族土家族自治县", "en": "", "kind": "region"}];
 const labelEls=labelData.map(d=>{const el=text('div',`geo-label ${d.kind}`);el.append(text(d.kind==='region'?'strong':'span','',d.zh));if(d.en){if(d.kind!=='region')el.append(document.createElement('br'));el.append(text('small','',d.en));}$('labels-layer').append(el);return el;});
 const markerEls=new Map();
 let atlas;
@@ -135,7 +122,7 @@ function screenPoint(coords){if(state.online&&streetMap){const p=streetMap.proje
 function renderOverlays(){
   if(!atlas?.width)return;
   const w=atlas.width,h=atlas.height,zoomRatio=atlas.camera.s/atlas.base;
-  labelData.forEach((d,i)=>{const el=labelEls[i],p=atlas.screen(d.point);el.style.left=`${p[0]}px`;el.style.top=`${p[1]}px`;el.hidden=state.online||p[0]<-70||p[0]>w+70||p[1]<10||p[1]>h-25||zoomRatio>3.5;el.style.opacity=zoomRatio>2?'0.45':'';});
+  const labelBoxes=[];labelData.forEach((d,i)=>{const el=labelEls[i],p=atlas.screen(d.point);const width=Math.min(120,d.zh.length*12),box={x:p[0]-width/2,y:p[1]-9,w:width,h:18};const overlap=labelBoxes.some(b=>box.x<b.x+b.w+6&&box.x+box.w+6>b.x&&box.y<b.y+b.h+4&&box.y+box.h+4>b.y);el.style.left=`${p[0]}px`;el.style.top=`${p[1]}px`;el.hidden=state.online||p[0]<0||p[0]>w||p[1]<10||p[1]>h-25||zoomRatio>10||overlap;if(!el.hidden)labelBoxes.push(box);el.style.opacity='1';});
   const groups=clusterPoints(state.filtered,screenPoint,small()?29:31);
   const allPins=groups.map(g=>({x:g.x-14,y:g.y-14,w:28,h:28}));
   const placed=[];const keep=new Set();
@@ -178,15 +165,15 @@ function expandCluster(items){
 }
 const clusterDialog=document.createElement('dialog');clusterDialog.className='cluster-dialog';clusterDialog.setAttribute('aria-label','选择聚合地点');document.body.append(clusterDialog);
 function showCluster(items){clusterDialog.replaceChildren();const heading=text('h2','',`${items.length} 个相邻或同址地点`),note=text('p','','这些地点保留各自坐标。请选择要查看的记录。'),close=text('button','cluster-close','关闭');close.type='button';close.onclick=()=>clusterDialog.close();clusterDialog.append(heading,note,close);for(const m of items){const button=text('button','cluster-choice');button.type='button';button.append(categoryIcon(m.category),text('span','',m.place),text('small','',m.placeEn||''));button.onclick=()=>{clusterDialog.close();openStory(m);};clusterDialog.append(button);}clusterDialog.showModal();}
-function resetView(){closeStory(false);$('map-context').replaceChildren(document.createTextNode('英国全览 ／ 每个坐标，都等着一个故事'));if(state.online)streetMap.fitBounds([[UK_BOUNDS[0],UK_BOUNDS[1]],[UK_BOUNDS[2],UK_BOUNDS[3]]],{padding:{top:90,bottom:65,left:40,right:50},duration:reduced?0:700});else atlas.reset();}
+function resetView(){closeStory(false);$('map-context').replaceChildren(document.createTextNode('重庆全览 ／ 猫咪地点'));if(state.online)streetMap.fitBounds([[MAP_BOUNDS[0],MAP_BOUNDS[1]],[MAP_BOUNDS[2],MAP_BOUNDS[3]]],{padding:{top:90,bottom:65,left:40,right:50},duration:reduced?0:700});else atlas.reset();}
 function refreshCollection(){
   state.items=[...state.real];
   const citySelection=$('city-filter').value;const cities=[...new Set(state.items.map(m=>m.city).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh-CN'));$('city-filter').replaceChildren(new Option('全部城市','all'),...cities.map(c=>new Option(c,c)),new Option('城市待确认','pending'));$('city-filter').value=cities.includes(citySelection)||citySelection==='pending'?citySelection:'all';
   state.filtered=sortMemories(filterMemories(state.items,state.region,state.query).filter(m=>$('city-filter').value==='all'||($('city-filter').value==='pending'?!m.city:m.city===$('city-filter').value)).filter(m=>$('category-filter').value==='all'||categoryOf(m.category)===$('category-filter').value),$('rating-sort').value);
   const demoOnly=state.items.length>0&&state.items.every(m=>m.demo);
   const count=new Set(state.items.map(m=>m.place?.trim()).filter(Boolean)).size;
-  $('place-count').textContent=String(count).padStart(2,'0');$('place-count').nextElementSibling.textContent=demoOnly?'示范地点':'收录地点';$('memory-count').textContent=String(state.real.length).padStart(2,'0');
-  $('map-key-label').textContent=demoOnly?'演示地点':state.items.some(m=>m.demo)?'真实与演示地点':'故事地点';
+  $('place-count').textContent=String(count).padStart(2,'0');$('place-count').nextElementSibling.textContent=demoOnly?'收录地点':'收录地点';$('memory-count').textContent=String(state.real.length).padStart(2,'0');
+  $('map-key-label').textContent=demoOnly?'演示地点':state.items.some(m=>m.demo)?'真实与演示地点':'猫咪地点';
   $('result-count').textContent=`${String(state.filtered.length).padStart(2,'0')} 个条目`;
   const f=document.createDocumentFragment();
   state.filtered.forEach((m,i)=>{
@@ -197,7 +184,7 @@ function refreshCollection(){
     body.querySelector('.row-sub').prepend(categoryIcon(m.category));
     if(m.review||photos.length){const meta=text('span','row-review');if(m.review){const rating=text('span','rating-display');renderRating(rating,m.review.rating,{compact:true});meta.append(rating);}if(photos.length)meta.append(text('span','row-photo-count',`${photos.length} 张照片`));body.append(meta);}row.append(body);const arrow=icon('arrow');arrow.classList.add('row-arrow');row.append(arrow);row.addEventListener('click',()=>openStory(m,row));f.append(row);
   });
-  if(!state.filtered.length){const e=text('div','empty-state');e.append(text('strong','',state.query?'还没找到这个地点。':'留白，是故事的开始。'),document.createTextNode(state.query?'试试别的名字。这里只搜索已经收录的内容。':state.items.length?'这个地区暂时没有记录。':'还没有公开的旅行记忆。'));f.append(e);}
+  if(!state.filtered.length){const e=text('div','empty-state');e.append(text('strong','',state.query?'还没找到这个地点。':'暂无地点'),document.createTextNode(state.query?'试试别的名字。这里只搜索已经收录的内容。':state.items.length?'这个地区暂时没有记录。':'作者登录后可添加猫咪地点。'));f.append(e);}
   document.querySelectorAll('#category-filters [data-category]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.category===($('category-filter').value||'all'))));
   document.querySelectorAll('#sort-buttons [data-sort]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.sort===$('rating-sort').value)));
   $('memory-list').replaceChildren(f);
@@ -233,7 +220,7 @@ function openStory(m,trigger=null){
   const i=state.filtered.findIndex(x=>x.id===m.id);$('story-index').textContent=`${String(i+1).padStart(2,'0')} / ${String(state.filtered.length).padStart(2,'0')}`;$('previous-story').disabled=i<=0;$('next-story').disabled=i>=state.filtered.length-1;
   if(!panel.open)panel.showModal();panel.scrollTop=0;document.documentElement.classList.add('has-story');
   document.querySelectorAll('.memory-row').forEach(row=>row.setAttribute('aria-pressed',String(row.dataset.id===m.id)));
-  $('map-context').textContent=[m.place,m.placeEn,m.demo?'演示地点':'故事地点'].filter(Boolean).join(' ／ ');
+  $('map-context').textContent=[m.place,m.placeEn,m.demo?'演示地点':'猫咪地点'].filter(Boolean).join(' ／ ');
   try{history.replaceState(null,'',`#place=${encodeURIComponent(m.id)}`);}catch{/* sandboxed/file previews may restrict history */}
   if(m.coordinates){if(state.online)streetMap.flyTo({center:m.coordinates,zoom:11,padding:{top:30,bottom:20,left:0,right:0},duration:reduced?0:850});else atlas.focus(m.coordinates,2.8);}
   $('story-place').focus({preventScroll:true});renderOverlays();
@@ -275,7 +262,7 @@ async function enterStreet(focus=null){
     if(streetMap){streetMap.remove();streetMap=null;}
     $('online-map').hidden=true;state.online=false;$('street-retry').hidden=false;
     $('street-retry').dataset.focus=focus?JSON.stringify(focus):'';
-    notify(`${error.message} 已保留手账总览。`,0);console.warn('[street]',error.message);
+    notify(`${error.message} 已保留区县总览。`,0);console.warn('[street]',error.message);
   }finally{if(token===streetToken){state.loadingStreet=false;delete $('street-button').dataset.loading;$('street-button').removeAttribute('aria-busy');}}
 }
 function enterOverview(){
@@ -286,14 +273,14 @@ function enterOverview(){
   }
   state.online=false;$('online-map').hidden=true;$('atlas-svg').hidden=false;$('map-frame').classList.remove('is-online');
   $('street-attribution').hidden=true;$('street-retry').hidden=true;$('overview-button').setAttribute('aria-pressed','true');$('street-button').setAttribute('aria-pressed','false');
-  atlas.render();notify('手账总览 · 简化海岸线，不包含街道细节。');
+  atlas.render();notify('重庆总览 · 区县边界，不包含街道细节。');
 }
 $('street-retry').addEventListener('click',()=>{if(state.online){streetMap.retry();return;}let focus=null;try{focus=JSON.parse($('street-retry').dataset.focus||'null');}catch{}enterStreet(focus);});
 
 async function loadStories(first=false){
   $('data-error').hidden=true;$('retry-data').hidden=true;
   const failures=[];
-  for(const [key,path] of [['firstMemory','./data/fountains-abbey.v0.3.json'],['memories','./data/memories.json?v=0.7']]){
+  for(const [key,path] of [['firstMemory','./data/starter.json'],['memories','./data/memories.json?v=0.7']]){
     try{const data=await readJson(path,key);const validated=validateMemories(data);if(key==='firstMemory')state.seed=validated;else {state.saved=validated;savedRoot={...data};delete savedRoot.memories;}}
     catch(error){failures.push(error.message);}
   }
@@ -361,11 +348,11 @@ function renderAlbum(){
     button.append(image,text('span','thumb-number',String(index+1).padStart(2,'0')));
     button.addEventListener('click',()=>setPhoto(index));$('photo-thumbnails').append(button);
   });
-  $('story-art-en').textContent=state.selected?.placeEn||'A little memory';
+  $('story-art-en').textContent=state.selected?.placeEn||'暂无照片';
   $('photo-thumbnails').hidden=photos.length<2;
   $('photo-credit').textContent=state.selected?.demo?'演示卡片 · 尚无照片':'作者提供的照片';
   $('photo-credit').hidden=!photos.length;
-  $('album-note').textContent=photos.length?`${photos.length} 张照片 · 原比例展示 · 点开可看大图`:'没有照片的记忆，也可以留在这里。';
+  $('album-note').textContent=photos.length?`${photos.length} 张照片 · 原比例展示 · 点开可看大图`:'暂无照片';
   setPhoto(0);
 }
 function setPhoto(index){
@@ -451,8 +438,8 @@ window.addEventListener('pageshow',e=>{if(e.persisted)refreshCloudReviews();});
 
 async function boot(){
   atlas=new OverviewMap();atlas.resize();
-  const results=await Promise.allSettled([readJson('./data/uk-overview.geojson','geography')]);
-  if(results[0].status==='fulfilled'){try{atlas.setGeography(results[0].value);notify('点开流水修道院，翻看她的照片与评价。',4800);}catch(e){notify(e.message,0);}}
+  const results=await Promise.allSettled([readJson('./data/chongqing-overview.geojson','geography')]);
+  if(results[0].status==='fulfilled'){try{atlas.setGeography(results[0].value);notify('暂无猫咪地点，作者登录后可以添加。',4800);}catch(e){notify(e.message,0);}}
   else notify('总览数据未能读取。请确认 public/data 已完整上传；直接打开请使用单文件预览版。',0);
   await loadStories(true);document.documentElement.dataset.state='ready';
   const match=location.hash.match(/^#place=(.+)$/);if(match){let id;try{id=decodeURIComponent(match[1]);}catch{}const m=state.items.find(m=>m.id===id);if(m)openStory(m);}

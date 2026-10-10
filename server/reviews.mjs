@@ -13,12 +13,11 @@ export function publicRecord(row) { return {id: row.id, review: review(row, 'pub
 function privateRecord(row) { return {...publicRecord(row), revision: row.revision, hasDraft: !!row.has_draft, draft: row.has_draft ? review(row, 'draft') : null, updatedAt: row.updated_at}; }
 export async function getPublicReviews(env) {
   const result = await dbRead(() => dbOf(env).prepare('SELECT id,published_author,published_half_stars,published_comment,published_at,published_revision FROM author_reviews').all());
-  if(!result.results.some(row=>row.id===RECORD_ID))throw new HttpError(503, 'SEED_REQUIRED', '数据库中还没有修道院记录，请执行初始化 SQL。');
   return result.results.map(publicRecord);
 }
 export async function getAuthorRecord(env) {
   const row = await dbRead(() => dbOf(env).prepare('SELECT * FROM author_reviews WHERE id = ?').bind(RECORD_ID).first());
-  if (!row) throw new HttpError(503, 'SEED_REQUIRED', '数据库中还没有修道院记录，请执行初始化 SQL。');
+  if (!row) return {id:RECORD_ID,review:{author:'竹喵',rating:null,comment:''},revision:0,hasDraft:false,draft:null};
   return privateRecord(row);
 }
 export function validateMutation(data) {

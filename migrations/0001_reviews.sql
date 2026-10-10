@@ -18,5 +18,3 @@ CREATE TABLE IF NOT EXISTS author_reviews (
   CHECK(draft_author IS NULL OR length(draft_author)<=80),
   CHECK(draft_comment IS NULL OR length(draft_comment)<=10000)
 );
-INSERT OR IGNORE INTO author_reviews (id,published_author,published_half_stars,published_comment)
-VALUES ('fountains-abbey','谢老师',10,'破旧的修道院比完整的好看多了！');

@@ -2,10 +2,10 @@
 
 从 `icewindwillow/map` 的本地提交 `16f1379` 独立复制，保留原项目历史。原仓库不作修改。
 
-- 新仓库：`icewindwillow/zhumiao-cat-map`
+- 新仓库：`icewindwillow/Claudia`
 - 本地预览：`npm run dev`
 - 检查：`npm run check`
-- 当前底图、搜索范围及已有地点/照片继承原英国地图；猫咪地点尚待整理。
+- 当前地图覆盖重庆，区县总览与街道瓦片使用 WGS84 坐标；猫咪地点从空白开始。原英国记录保留在历史提交中，不展示。
 - 如需上线，在 Cloudflare Pages 新建项目并连接新仓库，输出目录填写 `public`。作者后台需单独配置 D1 数据库、Cloudflare Access 与作者邮箱，勿绑定原地图数据库。
 - 不复制旧项目的部署环境、密钥或线上数据库。
 

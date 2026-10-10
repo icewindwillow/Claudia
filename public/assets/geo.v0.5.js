@@ -1,6 +1,6 @@
 /** Pure data and projection utilities. Coordinates always use [longitude, latitude]. */
-export const UK_BOUNDS = [-9.1, 49.65, 2.25, 61.0];
-export const REGIONS = {england:'英格兰',scotland:'苏格兰',wales:'威尔士',northernIreland:'北爱尔兰'};
+export const MAP_BOUNDS = [105.2, 28.1, 110.3, 32.3];
+export const REGIONS = {chongqing:'重庆'};
 export function project([lng, lat]) {
   const y = Math.max(-85, Math.min(85, lat)) * Math.PI / 180;
   return [lng, -Math.log(Math.tan(Math.PI/4 + y/2))*180/Math.PI];

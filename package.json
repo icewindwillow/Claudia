@@ -1,12 +1,12 @@
 {
-  "name": "zhumiao-cat-map",
+  "name": "claudia",
   "version": "0.8.0",
   "private": true,
   "description": "竹喵的撸猫地图：收藏遇见猫咪的地点、照片与故事。",
   "type": "module",
   "scripts": {
     "dev": "node scripts/serve.mjs",
-    "check": "node --test tests-v04/*.test.mjs"
+    "check": "node --test tests/claudia.test.mjs tests-v04/security.test.mjs"
   },
   "engines": {
     "node": ">=22.13"

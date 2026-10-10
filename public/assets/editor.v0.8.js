@@ -26,7 +26,7 @@ $('location-search-form').onsubmit=async e=>{
   searching=true;searchControls();$('location-results').replaceChildren();$('location-search-status').textContent='正在查找地点…';
   try{
     const data=await api('/author/api/search',{query});
-    $('location-search-status').textContent=data.results.length?`找到 ${data.results.length} 个候选地点，请核对城市和地址。${data.upstreamQuery!==query?'（检索：'+data.upstreamQuery+'）':''}`:'没有找到。试试英文地名＋城市，或在地图上选点。';
+    $('location-search-status').textContent=data.results.length?`找到 ${data.results.length} 个候选地点，请核对城市和地址。${data.upstreamQuery!==query?'（检索：'+data.upstreamQuery+'）':''}`:'没有找到。试试地点名＋重庆，或在地图上选点。';
     for(const result of data.results){
       const card=document.createElement('article');card.className='location-result';
       const title=document.createElement('strong');title.textContent=result.name;
@@ -57,12 +57,12 @@ function options(){
 function categoryUI(){for(const button of $('category-picker').children)button.setAttribute('aria-pressed',String(button.dataset.category===categoryOf($('category').value)));}
 for(const category of CATEGORIES){const button=document.createElement('button');button.type='button';button.dataset.category=category;button.append(categoryIcon(category),document.createTextNode(category));button.onclick=()=>{$('category').value=category;dirty=true;categoryUI();};$('category-picker').append(button);}
 function ratingUI(){$('rating').dataset.ratingTone=$('rating-value').dataset.ratingTone=ratingTone($('unrated').checked?null:Number($('rating').value));const value=$('unrated').checked?null:Number($('rating').value);$('rating-value').textContent=value===null?'未评分':`${value.toFixed(1)} / 5 ★`;$('rating').disabled=$('unrated').checked;}
-function point(){const x=$('longitude').value,y=$('latitude').value;if(x===''||y==='')return null;const c=[Number(x),Number(y)];return c.every(Number.isFinite)&&c[0]>=-15&&c[0]<=12&&c[1]>=46&&c[1]<=65?c:null;}
-function choosePoint(c){if(!ready||busy)return;if(c[0]<-15||c[0]>12||c[1]<46||c[1]>65){$('map-status').textContent='请选择英国及周边范围内的位置。';return;} $('longitude').value=c[0].toFixed(6);$('latitude').value=c[1].toFixed(6);dirty=true;current.locationPrecision='作者地图选点';delete current.coordinateSource;drawPins();$('map-status').textContent=`已选定：经度 ${c[0].toFixed(6)}，纬度 ${c[1].toFixed(6)}。保存或发布后才会更新。`;}
+function point(){const x=$('longitude').value,y=$('latitude').value;if(x===''||y==='')return null;const c=[Number(x),Number(y)];return c.every(Number.isFinite)&&c[0]>=105.2&&c[0]<=110.3&&c[1]>=28.1&&c[1]<=32.3?c:null;}
+function choosePoint(c){if(!ready||busy)return;if(c[0]<105.2||c[0]>110.3||c[1]<28.1||c[1]>32.3){$('map-status').textContent='请选择重庆范围内的位置。';return;} $('longitude').value=c[0].toFixed(6);$('latitude').value=c[1].toFixed(6);dirty=true;current.locationPrecision='作者地图选点';delete current.coordinateSource;drawPins();$('map-status').textContent=`已选定：经度 ${c[0].toFixed(6)}，纬度 ${c[1].toFixed(6)}。保存或发布后才会更新。`;}
 function select(id,newPlace=null){
   selected=id;const row=records.find(r=>r.id===id);current=structuredClone(newPlace||row?.draft||row?.published||base.find(p=>p.id===id));
   if(!current)return;current=normalizeCategory(current);photos=structuredClone(photosOf(current));
-  for(const [key,field]of Object.entries(fields))$(field).value=(key==='category'&&!CATEGORIES.includes(current.category)?'':current[key])|| (key==='region'?'england':key==='category'?'':'');categoryUI();
+  for(const [key,field]of Object.entries(fields))$(field).value=(key==='category'&&!CATEGORIES.includes(current.category)?'':current[key])|| (key==='region'?'chongqing':key==='category'?'':'');categoryUI();
   $('longitude').value=current.coordinates?.[0]??'';$('latitude').value=current.coordinates?.[1]??'';
   $('review-author').value=current.review?.author||'竹喵';$('return-dates').value=(current.visitDates||[]).filter(d=>d!==current.date).join(', ');$('comment').value=current.review?.comment||'';
   $('unrated').checked=current.review?.rating==null;$('rating').value=current.review?.rating??5;ratingUI();
@@ -85,7 +85,7 @@ async function load(){
   lock(true);
   try{
     const session=await api('/author/api/session');csrf=session.csrf;
-    const [seed,saved,cloud]=await Promise.all([api('/data/fountains-abbey.v0.3.json'),api('/data/memories.json?v=0.7'),api('/author/api/places')]);
+    const [seed,saved,cloud]=await Promise.all([api('/data/starter.json'),api('/data/memories.json?v=0.7'),api('/author/api/places')]);
     base=mergeMemories(seed.memories,saved.memories).map(p=>p.id===session.record.id?{...p,review:session.record.review}:p);records=cloud.records;
     // Preserve unpublished reviews created with the v0.4 editor until deliberately saved/published here.
     const legacy=session.record;
@@ -97,7 +97,7 @@ async function load(){
     message('已连接云端。可以新增地点、在地图上选点，并保存草稿或发布。');
   }catch(e){message(e.message,true);}finally{lock(false);}
 }
-function createPlace(){select('place-'+crypto.randomUUID(),{place:'',title:'',region:'england',coordinates:null,photos:[],review:{author:'竹喵',rating:null,comment:''}});dirty=true;$('location-query').focus();message('请先搜索地名并选择候选地点，位置会自动填写。');}
+function createPlace(){select('place-'+crypto.randomUUID(),{place:'',title:'',region:'chongqing',coordinates:null,photos:[],review:{author:'竹喵',rating:null,comment:''}});dirty=true;$('location-query').focus();message('请先搜索地名并选择候选地点，位置会自动填写。');}
 async function save(action){
   if(busy||!ready)return;
   if(action!=='discard-draft'&&!point()){message('请先搜索并选择地点，或在地图上点选位置。',true);$('location-query').focus();return;}
@@ -153,7 +153,7 @@ $('backup').onclick=()=>{if(!current)return;const blob=new Blob([JSON.stringify(
 window.addEventListener('beforeunload',e=>{if(dirty||busy){e.preventDefault();e.returnValue='';}});
 
 // Always-available coastline overview; street tiles are optional and have their own failure state.
-let view={x:-10,y:project([0,62])[1],w:13,h:project([0,49])[1]-project([0,62])[1]},street=null,modeToken=0;
+let view={x:105.2,y:project([0,32.3])[1],w:5.1,h:project([0,28.1])[1]-project([0,32.3])[1]},street=null,modeToken=0;
 function renderMap(){$('overview').setAttribute('viewBox',`${view.x} ${view.y} ${view.w} ${view.h}`);drawPins();}
 function drawPins(){
   $('selected-location').textContent=point()?`已定位：${$('place-name').value||'地图选点'} · ${$('address').value||'可在地图上微调'}`:'请先搜索并选择地点，也可以在地图上点选。';
@@ -164,7 +164,7 @@ function drawPins(){
 }
 function svgPosition(e){const p=new DOMPoint(e.clientX,e.clientY);return p.matrixTransform($('overview').getScreenCTM().inverse());}
 function zoom(factor){if(street){street.zoomBy(Math.log2(factor));return;}const w=Math.max(.025,Math.min(26,view.w/factor)),ratio=w/view.w;view={x:view.x+(view.w-w)/2,y:view.y+view.h*(1-ratio)/2,w,h:view.h*ratio};renderMap();}
-function focus(){const c=point();if(!c){message('先点击地图，或填写经纬度。',true);return;}if(street)street.flyTo({center:c,zoom:15});else{const p=project(c);view={x:p[0]-1.5,y:p[1]-2,w:3,h:4};renderMap();}}
+function focus(){const c=point();if(!c){message('先点击地图，或填写经纬度。',true);return;}if(street)street.flyTo({center:c,zoom:15});else{const p=project(c);view={x:p[0]-.04,y:p[1]-.05,w:.08,h:.1};renderMap();}}
 let drag=null;
 $('overview').addEventListener('pointerdown',e=>{if(e.button!==0)return;const p=svgPosition(e);drag={id:e.pointerId,x:e.clientX,y:e.clientY,last:p,moved:false};$('overview').setPointerCapture(e.pointerId);});
 $('overview').addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const p=svgPosition(e);if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6)drag.moved=true;if(drag.moved){view.x-=p.x-drag.last.x;view.y-=p.y-drag.last.y;renderMap();drag.last=svgPosition(e);}});
@@ -173,14 +173,14 @@ $('overview').addEventListener('pointercancel',()=>drag=null);
 $('overview').addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-Math.max(-100,Math.min(100,e.deltaY))*.004));},{passive:false});
 $('picker').addEventListener('keydown',e=>{if(street)return;if(['+','=','-'].includes(e.key)){e.preventDefault();zoom(e.key==='-'?1/1.5:1.5);}const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(d){e.preventDefault();view.x+=d[0]*view.w*.1;view.y+=d[1]*view.h*.1;renderMap();}});
 $('zoom-in').onclick=()=>zoom(1.7);$('zoom-out').onclick=()=>zoom(1/1.7);$('focus-pin').onclick=focus;
-$('map-reset').onclick=()=>{if(street)street.flyTo({center:[-3,55],zoom:5});else{view={x:-10,y:project([0,62])[1],w:13,h:project([0,49])[1]-project([0,62])[1]};renderMap();}};
+$('map-reset').onclick=()=>{if(street)street.flyTo({center:[106.55,29.56],zoom:11});else{view={x:105.2,y:project([0,32.3])[1],w:5.1,h:project([0,28.1])[1]-project([0,32.3])[1]};renderMap();}};
 $('center-pin').onclick=()=>choosePoint(street?[street.getCenter().lng,street.getCenter().lat]:unproject([view.x+view.w/2,view.y+view.h/2]));
 function overview(){++modeToken;if(street){street.remove();street=null;}$('street').hidden=true;$('overview').removeAttribute('hidden');$('attribution').hidden=true;$('overview-mode').setAttribute('aria-pressed','true');$('street-mode').setAttribute('aria-pressed','false');$('street-mode').disabled=false;renderMap();}
 $('overview-mode').onclick=overview;
 $('street-mode').onclick=async()=>{
   if(street){street.retry();return;}const token=++modeToken;$('street-mode').disabled=true;$('map-status').textContent='正在加载街道底图…';
   try{const config=await readStreetConfig();if(token!==modeToken)return;$('street').hidden=false;
-    street=new StreetMap({container:$('street'),center:point()||[-3,55],zoom:point()?14:5,config,onStatus:s=>{$('map-status').textContent=s.failed?'部分街道图片未加载，可再次点击“街道底图”重试，或切回总览。':'点击街道地图设置坐标；拖动与缩放不会改变已选位置。';}});
+    street=new StreetMap({container:$('street'),center:point()||[106.55,29.56],zoom:point()?14:11,config,onStatus:s=>{$('map-status').textContent=s.failed?'部分街道图片未加载，可再次点击“街道底图”重试，或切回总览。':'点击街道地图设置坐标；拖动与缩放不会改变已选位置。';}});
     const m=street;let start=null;
     $('street').addEventListener('pointerdown',e=>{if(m.pointers.size>1){start=null;return;}start={x:e.clientX,y:e.clientY,moved:false};},{signal:m.life.signal});
     $('street').addEventListener('pointermove',e=>{if(start&&Math.hypot(e.clientX-start.x,e.clientY-start.y)>6)start.moved=true;},{signal:m.life.signal});
@@ -190,7 +190,7 @@ $('street-mode').onclick=async()=>{
   }catch(e){if(token!==modeToken)return;overview();$('map-status').textContent=e.message+' 已保留总览地图，可继续选点。';}finally{if(token===modeToken)$('street-mode').disabled=false;}
 };
 new ResizeObserver(()=>{street?.resize();drawPins();}).observe($('picker'));
-async function geography(){try{const data=await api('/data/uk-overview.geojson');for(const f of data.features){const path=document.createElementNS(NS,'path');path.setAttribute('d',featurePath(f));path.setAttribute('class',`coast-${f.properties.kind}`);$('coast').append(path);}}catch(e){$('map-status').textContent='总览加载失败，请尝试街道底图或填写经纬度。';}}
+async function geography(){try{const data=await api('/data/chongqing-overview.geojson');for(const f of data.features){const path=document.createElementNS(NS,'path');path.setAttribute('d',featurePath(f));path.setAttribute('class',`coast-${f.properties.kind}`);$('coast').append(path);}}catch(e){$('map-status').textContent='总览加载失败，请尝试街道底图或填写经纬度。';}}
 renderMap();geography();load();
 
 function reviewCounts(){$('short-count').textContent=`${$('comment').value.length} 字 · 建议 60 字以内（已有长文字仍可保留）`;$('long-count').textContent=`${$('description').value.length} / 10000 字`;}
