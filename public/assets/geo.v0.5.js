@@ -75,7 +75,7 @@ export function safePhotoPath(value){
 }
 export function photosOf(memory){
   if(Array.isArray(memory.photos))return memory.photos;
-  return memory.photo?[{src:memory.photo,alt:memory.photoAlt||`${memory.place||'这个地点'}的照片`,caption:''}]:[];
+  return memory.photo?[{src:memory.photo,alt:memory.photoAlt||`${memory.place||'这只猫咪'}的照片`,caption:''}]:[];
 }
 /** Explicitly edited records override the bundled first story; existing unrelated records remain intact. */
 export function mergeMemories(seed, saved){const byId=new Map(seed.map(m=>[m.id,m]));for(const m of saved)byId.set(m.id,m);return [...byId.values()];}
