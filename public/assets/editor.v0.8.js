@@ -41,7 +41,7 @@ $('location-search-form').onsubmit=async e=>{
 function message(value,error=false){$('message').textContent=value;$('message').classList.toggle('error',error);}
 async function api(path,body){
   const response=await fetch(path,{cache:'no-store',credentials:'same-origin',redirect:'follow',signal:AbortSignal.timeout(45000),...(body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json','X-Atlas-CSRF':csrf},body:JSON.stringify(body)})});
-  if(response.status===401||response.status===403||!/application\/(?:[\w.-]+\+)?json/i.test(response.headers.get('Content-Type')||'')){const returnTo=location.pathname+location.search;message('登录会话已过期，正在重新登录…',true);setTimeout(()=>{location.href='/cdn-cgi/access/login?returnTo='+encodeURIComponent(returnTo)},150);throw new Error('登录会话已过期，正在重新登录。');}
+  if(response.status===401||response.status===403||!/application\/(?:[\w.-]+\+)?json/i.test(response.headers.get('Content-Type')||'')){message('登录会话已过期，正在重新登录…',true);setTimeout(()=>{location.replace('/author/?reauth='+Date.now())},150);throw new Error('登录会话已过期，正在重新登录。');}
   const data=await response.json();if(!response.ok||data.ok===false)throw new Error(data.message||`请求失败（${response.status}）`);return data;
 }
 function lock(value){busy=value;$('fields').disabled=value||!ready;for(const id of ['new-place','reload','place-select'])$(id).disabled=value||!ready;$('discard').disabled=value||!records.find(r=>r.id===selected)?.draft;searchControls();}
