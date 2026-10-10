@@ -38,7 +38,8 @@ export async function searchPlaces(env,body,{fetcher=fetch}={}){
   // Explicit authenticated searches only; never forward tokens, emails or story data.
   await db.prepare('CREATE TABLE IF NOT EXISTS place_search_cache (query TEXT PRIMARY KEY, results TEXT NOT NULL, fetched_at INTEGER NOT NULL)').run();
   await db.prepare('CREATE TABLE IF NOT EXISTS place_search_gate (id INTEGER PRIMARY KEY, owner TEXT NOT NULL, next_at INTEGER NOT NULL)').run();
-  const key='photon-cq-v1:'+upstreamQuery.toLowerCase();
+  // Version the cache when changing providers so stale empty Photon results cannot hide AMap hits.
+  const key='amap-cq-v2:'+upstreamQuery.toLowerCase();
   const cached=await db.prepare("SELECT results FROM place_search_cache WHERE query=? AND fetched_at>CAST(strftime('%s','now') AS INTEGER)-604800").bind(key).first();
   if(cached)return {query,upstreamQuery,results:JSON.parse(cached.results),cached:true};
   const owner=crypto.randomUUID();
