@@ -29,6 +29,10 @@ function normalizeNominatim(data){
   if(!Array.isArray(data))return [];
   return normalizeResults({features:data.map(x=>({geometry:{type:'Point',coordinates:[Number(x.lon),Number(x.lat)]},properties:{name:String(x.display_name||'').split(',')[0],street:'',city:'重庆',countrycode:'CN',osm_type:String(x.osm_type||'').slice(0,1).toUpperCase(),osm_id:Number(x.osm_id)}}))});
 }
+function normalizeAmap(data){
+  if(!data||data.status!=='1'||!Array.isArray(data.geocodes))return [];
+  return normalizeResults({features:data.geocodes.map(x=>{const [lon,lat]=String(x.location||'').split(',').map(Number);return {geometry:{type:'Point',coordinates:[lon,lat]},properties:{name:x.building||x.neighborhood||x.formatted_address?.split(/[，,]/)[0],city:'重庆',countrycode:'CN'}}})});
+}
 export async function searchPlaces(env,body,{fetcher=fetch}={}){
   const {query,upstreamQuery}=searchQuery(body?.query),db=dbOf(env);
   // Explicit authenticated searches only; never forward tokens, emails or story data.
@@ -47,6 +51,8 @@ export async function searchPlaces(env,body,{fetcher=fetch}={}){
     if(!response.ok)throw new HttpError(response.status===429?429:502,'SEARCH_UNAVAILABLE','地名服务暂时繁忙，请稍后重试。');
     let data;try{data=await response.json();}catch{throw new HttpError(502,'SEARCH_BAD_RESPONSE','地名服务没有返回有效结果，请稍后重试。');}
     let results=normalizeResults(data);
+    // AMap is the primary Chinese address source when configured.
+    if(env.AMAP_KEY){const amap=new URL('https://restapi.amap.com/v3/geocode/geo');amap.search=new URLSearchParams({address:query,city:'重庆',output:'JSON',key:String(env.AMAP_KEY)}).toString();try{const ar=await fetcher(amap.href,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(10000),redirect:'manual'});if(ar.ok){const ad=await ar.json(),mapped=normalizeAmap(ad);if(mapped.length)results=mapped;}}catch{}}
     // Photon sometimes misses Chinese street addresses when the city suffix is added.
     if(!results.length&&upstreamQuery!==query){url.search=new URLSearchParams({q:query,limit:'20',lang:'zh',bbox:'105.2,28.1,110.3,32.3'}).toString();const retry=await fetcher(url.href,{headers:{Accept:'application/json','User-Agent':'ClaudiaCatMap/1.0'},signal:AbortSignal.timeout(12000),redirect:'manual'});if(retry.ok)results=normalizeResults(await retry.json());}
     if(!results.length){const nom=new URL('https://nominatim.openstreetmap.org/search');nom.search=new URLSearchParams({q:query+' 重庆',format:'jsonv2',limit:'10',countrycodes:'cn',viewbox:'105.2,32.3,110.3,28.1',bounded:'1','accept-language':'zh-CN'}).toString();try{const retry=await fetcher(nom.href,{headers:{Accept:'application/json','User-Agent':'ClaudiaCatMap/1.0 (+https://github.com/icewindwillow/Claudia)'},signal:AbortSignal.timeout(12000),redirect:'manual'});if(retry.ok)results=normalizeNominatim(await retry.json());}catch{}}
