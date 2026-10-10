@@ -29,6 +29,7 @@ body.author-desk{--white:#171e1a;background:#0c100f;color:var(--ink);padding-bot
 .author-desk .picker{background:#101715;width:100%;touch-action:none}
 .author-desk .photo-series{margin:14px 0;padding:14px;background:#202c23;border:1px solid #526456;border-radius:8px;color:#edf2eb}
 .author-desk .photo-series-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #35473b;font-size:12px}.author-desk .photo-series-row:last-child{border-bottom:0}.author-desk .photo-series-row small,.author-desk .photo-series>small{color:#b3c2b7;font-size:11px}
+.author-desk .photo-series-row input{margin:0;flex:1;min-height:36px;padding:7px 9px}.author-desk #confirm-photo-series{margin-top:14px;width:100%}
 .author-desk .place-toolbar,.author-desk .map-toolbar,.author-desk .category-picker,.author-desk .result-actions{flex-wrap:wrap}
 .author-desk .section-nav{flex-wrap:wrap}
 .author-desk .two-col>*{min-width:0}
