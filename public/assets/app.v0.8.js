@@ -180,7 +180,7 @@ function refreshCollection(){
     const row=text('button','memory-row');row.type='button';row.dataset.id=m.id;row.dataset.category=categoryOf(m.category);row.dataset.ratingTone=ratingTone(m.review?.rating);row.setAttribute('aria-pressed',String(state.selected?.id===m.id));
     const photos=photosOf(m);
     if(photos.length){const thumb=document.createElement('img');thumb.className='row-photo';thumb.src=photoSrc(photos[0].thumbnail||photos[0].src);thumb.alt='';thumb.loading='lazy';row.append(thumb);}else {const mark=text('span','row-category-mark');mark.append(categoryIcon(m.category));row.append(mark);}
-    const body=text('span','row-body');const title=text('span','row-title');title.append(text('strong','',m.place||'地点待补'));if(m.placeEn)title.append(text('small','',m.placeEn));body.append(title,text('span','row-sub',[m.city||'城市待确认',m.category,m.demo?'演示':m.date,!m.coordinates?'定位待补':''].filter(Boolean).join(' · ')));
+    const body=text('span','row-body');const title=text('span','row-title');title.append(text('strong','',m.place||'地点待补'));if(m.placeEn)title.append(text('small','',m.placeEn));body.append(title,text('span','row-sub',[m.city||'',m.category,m.demo?'演示':m.date,!m.coordinates?'定位待补':''].filter(Boolean).join(' · ')));
     body.querySelector('.row-sub').prepend(categoryIcon(m.category));
     if(m.review||photos.length){const meta=text('span','row-review');if(m.review){const rating=text('span','rating-display');renderRating(rating,m.review.rating,{compact:true});meta.append(rating);}if(photos.length)meta.append(text('span','row-photo-count',`${photos.length} 张照片`));body.append(meta);}row.append(body);const arrow=icon('arrow');arrow.classList.add('row-arrow');row.append(arrow);row.addEventListener('click',()=>openStory(m,row));f.append(row);
   });
@@ -206,7 +206,7 @@ function openStory(m,trigger=null){
   showGuests(m.id);
   const panel=$('story-panel');
   if(trigger)lastFocus=trigger;else if(!panel.open)lastFocus=document.activeElement;
-  $('story-kind').textContent=m.demo?'DEMO POSTCARD / 演示卡片':'A PLACE TO KEEP / 地点相册';
+  $('story-kind').textContent=m.demo?'DEMO POSTCARD / 演示卡片':'地点相册';
   $('story-category').replaceChildren(categoryIcon(m.category),document.createTextNode(categoryOf(m.category)));
   $('story-region').textContent=[m.locationLabel||REGIONS[m.region],m.category,(m.visitDates?.length?m.visitDates.join(' · '):m.date)].filter(Boolean).join(' · ');
   $('story-place').replaceChildren(document.createTextNode(m.place||'地点待补'));if(m.placeEn)$('story-place').append(text('small','',m.placeEn));
@@ -214,7 +214,7 @@ function openStory(m,trigger=null){
   $('story-title').textContent=m.title;$('story-description').textContent=m.description||'';
   $('review-author').textContent=m.review?.author||'';renderRating($('story-rating'),m.review?.rating);
   $('review-comment').textContent=m.review?.comment||'';$('review-comment').hidden=!m.review?.comment;$('review-empty').hidden=!!m.review?.comment;
-  $('story-location').textContent=m.coordinates?`${m.locationPrecision||'记录坐标'}\n${Math.abs(m.coordinates[1]).toFixed(4)}° ${m.coordinates[1]>=0?'N':'S'} · ${Math.abs(m.coordinates[0]).toFixed(4)}° ${m.coordinates[0]>=0?'E':'W'}`:'这个故事还没有坐标；先保留文字，不猜测它的位置。';
+  $('story-location').textContent=m.coordinates?`${m.locationPrecision||'记录坐标'}\n${Math.abs(m.coordinates[1]).toFixed(4)}° ${m.coordinates[1]>=0?'N':'S'} · ${Math.abs(m.coordinates[0]).toFixed(4)}° ${m.coordinates[0]>=0?'E':'W'}`:'地址待补充';
   $('story-location').style.whiteSpace='pre-line';$('story-disclaimer').hidden=!m.demo;$('story-street').hidden=!m.coordinates;$('story-author').hidden=!!m.demo;
   renderAlbum();
   const i=state.filtered.findIndex(x=>x.id===m.id);$('story-index').textContent=`${String(i+1).padStart(2,'0')} / ${String(state.filtered.length).padStart(2,'0')}`;$('previous-story').disabled=i<=0;$('next-story').disabled=i>=state.filtered.length-1;

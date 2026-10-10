@@ -1,4 +1,25 @@
 {
   "schemaVersion": 1,
-  "memories": []
+  "memories": [
+    {
+      "id": "cat-photo-test",
+      "place": "猫咪合影 · 测试",
+      "title": "猫咪合影 · 测试",
+      "region": "chongqing",
+      "category": "其他",
+      "coordinates": null,
+      "locationLabel": "",
+      "city": "",
+      "description": "",
+      "photos": [
+        {
+          "src": "./assets/photos/claudia-test/cat-test.jpg",
+          "alt": "人与猫咪的合影测试照片",
+          "caption": "",
+          "width": 1280,
+          "height": 960
+        }
+      ]
+    }
+  ]
 }
