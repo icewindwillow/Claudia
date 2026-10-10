@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>地图编辑室 · 竹喵的撸猫地图</title><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/assets/editor.v0.5.2.css"><script type="module" src="/assets/editor.v0.8.js?v=20261011-3"></script><link rel="stylesheet" href="/assets/place-style.v0.6.css"><link rel="stylesheet" href="/assets/reviews.v0.7.css"><link rel="stylesheet" href="/assets/details.v0.8.css"><link rel="stylesheet" href="/assets/claudia.css"><link rel="stylesheet" href="/assets/claudia-editor.css?v=20261010-2"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>地图编辑室 · 竹喵的撸猫地图</title><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/assets/editor.v0.5.2.css"><script type="module" src="/assets/editor.v0.8.js?v=20261011-4"></script><link rel="stylesheet" href="/assets/place-style.v0.6.css"><link rel="stylesheet" href="/assets/reviews.v0.7.css"><link rel="stylesheet" href="/assets/details.v0.8.css"><link rel="stylesheet" href="/assets/claudia.css"><link rel="stylesheet" href="/assets/claudia-editor.css?v=20261010-2"></head>
 <body class="author-desk">
 <header class="desk-header"><a class="desk-brand" href="/">z. 竹喵的撸猫地图 · 编辑室</a><nav><a href="/" target="_blank" rel="noopener">查看公开地图 ↗</a><a href="/cdn-cgi/access/logout">退出登录</a></nav></header>
 <main class="desk-shell">
@@ -10,10 +10,10 @@
 <div class="workspace">
 <aside class="map-column" id="location-panel"><section class="place-search-panel" aria-labelledby="search-heading">
 <div class="panel-heading"><h2 id="search-heading">查找地点</h2><span>重庆地名库</span></div>
-<form id="location-search-form"><label for="location-query">猫咖、公园或街道名称</label><div class="search-input-row"><input id="location-query" type="search" minlength="2" maxlength="160" required placeholder="例如：重庆猫咖 / 鹅岭公园" autocomplete="off" disabled><button id="location-search-button" class="button primary" disabled>搜索地名</button></div></form>
-<p class="search-hint">搜索重庆地名库，不限于已收录地点。输入地点名称；找不到时可在地图上选点。</p>
+<form id="location-search-form"><label for="location-query">输入遇见地点（只用于定位）</label><div class="search-input-row"><input id="location-query" type="search" minlength="2" maxlength="160" required placeholder="例如：翰林景园 / 鹅岭公园" autocomplete="off" disabled><button id="location-search-button" class="button primary" disabled>搜索地点</button></div></form>
+<p class="search-hint">搜索结果只会填写地址和地图坐标，不会替你填写猫咪名字。找不到时也可以直接在地图上选点。</p>
 <p id="location-search-status" role="status" aria-live="polite"></p><div id="location-results" class="location-results"></div>
-<details class="search-disclosure"><summary>搜索服务与隐私说明</summary><small>点击搜索才会将搜索词发送至 Photon，结果在本站缓存 7 天。请勿输入私人敏感地址。地名数据 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> · 搜索服务 <a href="https://photon.komoot.io" target="_blank" rel="noopener">Photon</a></small></details>
+<details class="search-disclosure"><summary>搜索服务与隐私说明</summary><small>点击搜索才会将搜索词发送至地名服务，结果在本站缓存 7 天。请勿输入私人敏感地址。地名数据 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a></small></details>
 </section>
 <div class="map-card"><div class="panel-heading"><h2>位置预览</h2><span>搜索后自动定位</span></div>
 <div class="map-toolbar"><button id="overview-mode" class="button" aria-pressed="true">区县总览</button><button id="street-mode" class="button" aria-pressed="false">街道底图</button><button id="focus-pin" class="button">定位当前点</button></div>

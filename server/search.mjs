@@ -17,10 +17,10 @@ export function normalizeResults(data){
     const name=str(p.name,160)||str(p.street,160);if(!name)continue;
     const key=`${name}|${c.map(x=>x.toFixed(4)).join(',')}`;if(seen.has(key))continue;seen.add(key);
     const region='chongqing';
-    const address=[p.housenumber,p.street,p.city||p.town||p.district,p.county,p.state,p.postcode].filter(v=>typeof v==='string').filter((v,i,a)=>a.indexOf(v)===i).join(', ').slice(0,200);
+    const address=typeof p.address==='string'&&p.address.trim()?p.address.trim().slice(0,200):[p.housenumber,p.street,p.city||p.town||p.district,p.county,p.state,p.postcode].filter(v=>typeof v==='string').filter((v,i,a)=>a.indexOf(v)===i).join(', ').slice(0,200);
     const osmType={N:'node',W:'way',R:'relation'}[p.osm_type],osmId=Number(p.osm_id);
     const sourceUrl=osmType&&Number.isSafeInteger(osmId)&&osmId>0?`https://www.openstreetmap.org/${osmType}/${osmId}`:'https://www.openstreetmap.org/copyright';
-    results.push({name,address,city:str(p.city||p.town||p.village,120),region,coordinates:c,kind:str(p.osm_value,80),sourceUrl});
+    results.push({name,address,city:str(p.city||p.town||p.village,120),region,coordinates:c,kind:str(p.osm_value,80),sourceUrl,sourceName:str(p.sourceName,80)||'OpenStreetMap / Photon'});
     if(results.length===8)break;
   }
   return results;
@@ -31,7 +31,11 @@ function normalizeNominatim(data){
 }
 function normalizeAmap(data){
   if(!data||data.status!=='1'||!Array.isArray(data.geocodes))return [];
-  return normalizeResults({features:data.geocodes.map(x=>{const [lon,lat]=String(x.location||'').split(',').map(Number);const name=(typeof x.building?.name==='string'&&x.building.name)||(typeof x.neighborhood?.name==='string'&&x.neighborhood.name)||String(x.formatted_address||'').split(/[，,]/)[0];return {geometry:{type:'Point',coordinates:[lon,lat]},properties:{name,address:x.formatted_address,city:x.city||'重庆',district:x.district,countrycode:'CN'}}})});
+  return normalizeResults({features:data.geocodes.map(x=>{
+    const [lon,lat]=String(x.location||'').split(',').map(Number);
+    const name=(typeof x.building?.name==='string'&&x.building.name)||(typeof x.neighborhood?.name==='string'&&x.neighborhood.name)||String(x.formatted_address||'').split(/[，,]/)[0];
+    return {geometry:{type:'Point',coordinates:[lon,lat]},properties:{name,address:x.formatted_address,city:x.city||'重庆',district:x.district,countrycode:'CN',sourceName:'高德地图'}};
+  })});
 }
 
 async function fetchJson(fetcher,url,options,code='SEARCH_UNAVAILABLE'){

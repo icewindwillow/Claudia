@@ -10,13 +10,15 @@ function searchControls(){for(const id of ['location-query','location-search-but
 function useResult(result,asNew){
   if(busy||searching||!ready)return;
   if(asNew){if(!leaveOK())return;createPlace();}
-  else if(!confirm('将更新当前地点的名称和位置，照片与评价保持不变。继续吗？'))return;
-  $('place-name').value=result.name;$('place-en').value=result.name;$('address').value=result.address;
+  else if(!confirm('将更新当前地点的位置，猫咪名字、照片与评价保持不变。继续吗？'))return;
+  // Search results locate the encounter; they are not the cat's name.
+  // Keep both cat-name fields untouched and only apply place metadata.
+  $('address').value=result.address||result.name;
   $('region').value=result.region||'';$('city').value=result.city||'';
   $('longitude').value=result.coordinates[0];$('latitude').value=result.coordinates[1];
-  current.locationPrecision='地名库参考位置 · 可在地图微调';current.coordinateSource={name:'OpenStreetMap / Photon',url:result.sourceUrl};
+  current.locationPrecision='地名库参考位置 · 可在地图微调';current.coordinateSource={name:result.sourceName||'地名库参考位置',url:result.sourceUrl};
   dirty=true;drawPins();focus();$('advanced-location').open=false;
-  message('已选中 '+result.name+'。位置已自动填写，可以添加照片、评分和撸猫记录，再保存或发布。');
+  message('已选中位置 '+result.name+'。坐标和地址已填写，请手动填写猫咪名字，再保存或发布。');
   $('place-name').scrollIntoView({block:'center',behavior:'smooth'});
 }
 $('location-search-form').onsubmit=async e=>{
