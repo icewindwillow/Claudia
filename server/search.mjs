@@ -31,7 +31,7 @@ function normalizeNominatim(data){
 }
 function normalizeAmap(data){
   if(!data||data.status!=='1'||!Array.isArray(data.geocodes))return [];
-  return normalizeResults({features:data.geocodes.map(x=>{const [lon,lat]=String(x.location||'').split(',').map(Number);return {geometry:{type:'Point',coordinates:[lon,lat]},properties:{name:x.building||x.neighborhood||x.formatted_address?.split(/[，,]/)[0],city:'重庆',countrycode:'CN'}}})});
+  return normalizeResults({features:data.geocodes.map(x=>{const [lon,lat]=String(x.location||'').split(',').map(Number);const name=(typeof x.building?.name==='string'&&x.building.name)||(typeof x.neighborhood?.name==='string'&&x.neighborhood.name)||String(x.formatted_address||'').split(/[，,]/)[0];return {geometry:{type:'Point',coordinates:[lon,lat]},properties:{name,address:x.formatted_address,city:x.city||'重庆',district:x.district,countrycode:'CN'}}})});
 }
 export async function searchPlaces(env,body,{fetcher=fetch}={}){
   const {query,upstreamQuery}=searchQuery(body?.query),db=dbOf(env);
