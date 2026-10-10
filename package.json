@@ -1,8 +1,8 @@
 {
-  "name": "uk-memory-map",
+  "name": "zhumiao-cat-map",
   "version": "0.8.0",
   "private": true,
-  "description": "UK memory atlas: protected multi-place map editor, photo albums, D1 drafts and publishing, star sorting.",
+  "description": "竹喵的撸猫地图：收藏遇见猫咪的地点、照片与故事。",
   "type": "module",
   "scripts": {
     "dev": "node scripts/serve.mjs",

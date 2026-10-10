@@ -64,7 +64,7 @@ function select(id,newPlace=null){
   if(!current)return;current=normalizeCategory(current);photos=structuredClone(photosOf(current));
   for(const [key,field]of Object.entries(fields))$(field).value=(key==='category'&&!CATEGORIES.includes(current.category)?'':current[key])|| (key==='region'?'england':key==='category'?'':'');categoryUI();
   $('longitude').value=current.coordinates?.[0]??'';$('latitude').value=current.coordinates?.[1]??'';
-  $('review-author').value=current.review?.author||'谢曼殊';$('return-dates').value=(current.visitDates||[]).filter(d=>d!==current.date).join(', ');$('comment').value=current.review?.comment||'';
+  $('review-author').value=current.review?.author||'竹喵';$('return-dates').value=(current.visitDates||[]).filter(d=>d!==current.date).join(', ');$('comment').value=current.review?.comment||'';
   $('unrated').checked=current.review?.rating==null;$('rating').value=current.review?.rating??5;ratingUI();
   reviewCounts();dirty=false;options();renderPhotos();lock(false);showModeration(id,api);
   const published=row?.published||base.find(p=>p.id===id);
@@ -97,7 +97,7 @@ async function load(){
     message('已连接云端。可以新增地点、在地图上选点，并保存草稿或发布。');
   }catch(e){message(e.message,true);}finally{lock(false);}
 }
-function createPlace(){select('place-'+crypto.randomUUID(),{place:'',title:'',region:'england',coordinates:null,photos:[],review:{author:'谢曼殊',rating:null,comment:''}});dirty=true;$('location-query').focus();message('请先搜索地名并选择候选地点，位置会自动填写。');}
+function createPlace(){select('place-'+crypto.randomUUID(),{place:'',title:'',region:'england',coordinates:null,photos:[],review:{author:'竹喵',rating:null,comment:''}});dirty=true;$('location-query').focus();message('请先搜索地名并选择候选地点，位置会自动填写。');}
 async function save(action){
   if(busy||!ready)return;
   if(action!=='discard-draft'&&!point()){message('请先搜索并选择地点，或在地图上点选位置。',true);$('location-query').focus();return;}
