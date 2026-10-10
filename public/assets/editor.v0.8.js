@@ -1,5 +1,4 @@
 import {showModeration} from './guests.v0.8.js';
-import {cityFromAddress} from './details.v0.8.js';
 import {normalizeCategory,CATEGORIES,categoryOf,categoryIcon,ratingTone} from './place-style.v0.8.js';
 import {project,unproject,featurePath,mergeMemories,photosOf} from './geo.v0.5.js';
 import {StreetMap,readStreetConfig} from './streets.v0.4.js';
@@ -13,11 +12,11 @@ function useResult(result,asNew){
   if(asNew){if(!leaveOK())return;createPlace();}
   else if(!confirm('将更新当前地点的名称和位置，照片与评价保持不变。继续吗？'))return;
   $('place-name').value=result.name;$('place-en').value=result.name;$('address').value=result.address;
-  $('region').value=result.region||'';$('city').value=cityFromAddress(result.address)||result.city||'';
+  $('region').value=result.region||'';$('city').value=result.city||'';
   $('longitude').value=result.coordinates[0];$('latitude').value=result.coordinates[1];
   current.locationPrecision='地名库参考位置 · 可在地图微调';current.coordinateSource={name:'OpenStreetMap / Photon',url:result.sourceUrl};
   dirty=true;drawPins();focus();$('advanced-location').open=false;
-  message('已选中 '+result.name+'。位置已自动填写，可以添加照片、评分和故事，再保存或发布。');
+  message('已选中 '+result.name+'。位置已自动填写，可以添加照片、评分和撸猫记录，再保存或发布。');
   $('place-name').scrollIntoView({block:'center',behavior:'smooth'});
 }
 $('location-search-form').onsubmit=async e=>{
