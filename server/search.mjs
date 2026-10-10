@@ -37,12 +37,14 @@ export async function searchPlaces(env,body,{fetcher=fetch}={}){
   const lease=await db.prepare("INSERT INTO place_search_gate (id,owner,next_at) VALUES (1,?,CAST(strftime('%s','now') AS INTEGER)+30) ON CONFLICT(id) DO UPDATE SET owner=excluded.owner,next_at=excluded.next_at WHERE place_search_gate.next_at<=CAST(strftime('%s','now') AS INTEGER) RETURNING id").bind(owner).first();
   if(!lease)throw new HttpError(429,'SEARCH_BUSY','搜索稍忙，请等待几秒后再点击搜索。');
   try{
-    const url=new URL('https://photon.komoot.io/api/');url.search=new URLSearchParams({q:upstreamQuery,limit:'8',lang:'en',countrycode:'CN',bbox:'105.2,28.1,110.3,32.3'}).toString();
+    const url=new URL('https://photon.komoot.io/api/');url.search=new URLSearchParams({q:upstreamQuery,limit:'20',lang:'zh',bbox:'105.2,28.1,110.3,32.3'}).toString();
     let response;
     try{response=await fetcher(url.href,{headers:{Accept:'application/json','User-Agent':'ClaudiaCatMap/1.0 (+https://github.com/icewindwillow/Claudia)'},signal:AbortSignal.timeout(12000),redirect:'manual'});}catch{throw new HttpError(502,'SEARCH_UNAVAILABLE','地名服务暂时无法连接，输入已保留。请稍后重试，或用地图选点。');}
     if(!response.ok)throw new HttpError(response.status===429?429:502,'SEARCH_UNAVAILABLE','地名服务暂时繁忙，请稍后重试。');
     let data;try{data=await response.json();}catch{throw new HttpError(502,'SEARCH_BAD_RESPONSE','地名服务没有返回有效结果，请稍后重试。');}
-    const results=normalizeResults(data);
+    let results=normalizeResults(data);
+    // Photon sometimes misses Chinese street addresses when the city suffix is added.
+    if(!results.length&&upstreamQuery!==query){url.search=new URLSearchParams({q:query,limit:'20',lang:'zh',bbox:'105.2,28.1,110.3,32.3'}).toString();const retry=await fetcher(url.href,{headers:{Accept:'application/json','User-Agent':'ClaudiaCatMap/1.0'},signal:AbortSignal.timeout(12000),redirect:'manual'});if(retry.ok)results=normalizeResults(await retry.json());}
     await db.prepare("INSERT INTO place_search_cache (query,results,fetched_at) VALUES (?,?,CAST(strftime('%s','now') AS INTEGER)) ON CONFLICT(query) DO UPDATE SET results=excluded.results,fetched_at=excluded.fetched_at").bind(key,JSON.stringify(results)).run();
     return {query,upstreamQuery,results,cached:false};
   }finally{await db.prepare("UPDATE place_search_gate SET next_at=CAST(strftime('%s','now') AS INTEGER)+2 WHERE id=1 AND owner=?").bind(owner).run();}

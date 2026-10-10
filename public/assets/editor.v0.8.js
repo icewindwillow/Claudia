@@ -4,7 +4,7 @@ import {project,unproject,featurePath,mergeMemories,photosOf} from './geo.v0.5.j
 import {StreetMap,readStreetConfig} from './streets.v0.4.js';
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 let base=[],records=[],selected=null,current=null,photos=[],csrf='',busy=false,dirty=false,ready=false;
-const fields={place:'place-name',placeEn:'place-en',region:'region',category:'category',locationLabel:'address',date:'trip-date',description:'description',city:'city',officialIntroduction:'official-introduction'};
+const fields={place:'place-name',placeEn:'place-en',region:'region',category:'category',lifeStatus:'life-status',locationLabel:'address',date:'trip-date',description:'description',city:'city',officialIntroduction:'official-introduction'};
 let searching=false;
 function searchControls(){for(const id of ['location-query','location-search-button'])$(id).disabled=!ready||busy||searching;for(const b of $('location-results').querySelectorAll('button'))b.disabled=!ready||busy||searching;}
 function useResult(result,asNew){
