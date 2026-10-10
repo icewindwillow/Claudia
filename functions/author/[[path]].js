@@ -21,9 +21,10 @@ export async function onRequest(context) {
     if(url.pathname==='/author/api/guest-reviews'&&request.method==='GET')return json({ok:true,...await visitorList(env,url.searchParams.get('place'),url.searchParams.get('before')||'')});
     if(url.pathname==='/author/api/guest-review/delete'&&request.method==='POST'){await requireWrite(request,env);return json({ok:true,...await deleteVisitor(env,await limitedJson(request,2048),author)});}
 
-    if(url.pathname==='/author/api/search' && request.method==='POST') {
+    if(url.pathname==='/author/api/search' && (request.method==='GET'||request.method==='POST')) {
       await requireWrite(request,env);
-      return json({ok:true,...await searchPlaces(env,await limitedJson(request,2048))});
+      const body=request.method==='GET'?{query:url.searchParams.get('query')||''}:await limitedJson(request,2048);
+      return json({ok:true,...await searchPlaces(env,body)});
     }
     if(url.pathname==='/author/api/places' && request.method==='GET')return json({ok:true,records:await listPlaces(env,true)});
     if(url.pathname==='/author/api/photo' && request.method==='GET')return await readPhoto(env,url.searchParams.get('id'),true);

@@ -24,7 +24,7 @@ $('location-search-form').onsubmit=async e=>{
   const query=$('location-query').value.trim();if(query.length<2)return;
   searching=true;searchControls();$('location-results').replaceChildren();$('location-search-status').textContent='正在查找地点…';
   try{
-    const data=await api('/author/api/search',{query});
+    const data=await api('/author/api/search?query='+encodeURIComponent(query));
     $('location-search-status').textContent=data.results.length?`找到 ${data.results.length} 个候选地点，请核对城市和地址。${data.upstreamQuery!==query?'（检索：'+data.upstreamQuery+'）':''}`:'没有找到。试试地点名＋重庆，或在地图上选点。';
     for(const result of data.results){
       const card=document.createElement('article');card.className='location-result';
