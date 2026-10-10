@@ -15,10 +15,13 @@ body.author-desk{--white:#171e1a;background:#0c100f;color:var(--ink);padding-bot
 .author-desk input::placeholder,.author-desk textarea::placeholder{color:#9eafa3;opacity:1}
 .author-desk :is(input,select,textarea,button,a):focus-visible{outline:2px solid #b6d997;outline-offset:3px}
 .author-desk .button,.author-desk .result-actions button,.author-desk .category-chip,.author-desk .photo-actions button{background:#26372b;color:#edf2eb;border-color:#526456}
+.author-desk .category-picker button{background:#26372b;color:#edf2eb;border:1px solid #526456}
+.author-desk .category-picker button .category-icon{color:#b6d997;fill:currentColor}
 .author-desk .button:hover,.author-desk .section-nav a:hover{background:#354b3b;color:#fff}
 .author-desk .button.primary,.author-desk .result-actions button:first-child{background:#b6d997;color:#152017;border-color:#b6d997}
 .author-desk .button.primary:hover{background:#c8e7ad}
 .author-desk .button[aria-pressed=true],.author-desk .category-chip[aria-pressed=true]{background:#b6d997;color:#152017;border-color:#b6d997}
+.author-desk .category-picker button[aria-pressed=true]{background:#b6d997;color:#152017;border-color:#b6d997}
 .author-desk .step-number,.author-desk .section-nav a:first-child{background:#2c4030;color:#d5e9ca}
 .author-desk .location-result{background:#202c23;border-color:#425446}
 .author-desk .review-divider{border-color:#35473b}
