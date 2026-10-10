@@ -41,7 +41,8 @@ $('location-search-form').onsubmit=async e=>{
 function message(value,error=false){$('message').textContent=value;$('message').classList.toggle('error',error);}
 async function api(path,body){
   const response=await fetch(path,{cache:'no-store',credentials:'same-origin',redirect:'follow',signal:AbortSignal.timeout(45000),...(body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json','X-Atlas-CSRF':csrf},body:JSON.stringify(body)})});
-  if(response.status===401||response.status===403||!/application\/(?:[\w.-]+\+)?json/i.test(response.headers.get('Content-Type')||'')){message('登录会话已过期，正在重新登录…',true);setTimeout(()=>{location.replace('/author/?reauth='+Date.now())},150);throw new Error('登录会话已过期，正在重新登录。');}
+  if(response.status===401||response.status===403||!/application\/(?:[\w.-]+\+)?json/i.test(response.headers.get('Content-Type')||'')){const key='claudia-access-reauth';const last=Number(sessionStorage.getItem(key)||0);if(Date.now()-last<30000){message('作者后台页面已登录，但搜索接口没有通过 Cloudflare Access。请在 Access 应用中保留目标 author/*，保存后重新打开本页。',true);throw new Error('搜索接口未通过 Cloudflare Access。');}sessionStorage.setItem(key,String(Date.now()));message('登录会话已过期，正在重新登录…',true);setTimeout(()=>{location.replace('/author/?reauth='+Date.now())},150);throw new Error('登录会话已过期，正在重新登录。');}
+  sessionStorage.removeItem('claudia-access-reauth');
   const data=await response.json();if(!response.ok||data.ok===false)throw new Error(data.message||`请求失败（${response.status}）`);return data;
 }
 function lock(value){busy=value;$('fields').disabled=value||!ready;for(const id of ['new-place','reload','place-select'])$(id).disabled=value||!ready;$('discard').disabled=value||!records.find(r=>r.id===selected)?.draft;searchControls();}
