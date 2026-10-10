@@ -6,6 +6,7 @@ const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 let base=[],records=[],selected=null,current=null,photos=[],csrf='',busy=false,dirty=false,ready=false;
 const fields={place:'place-name',placeEn:'place-en',region:'region',breed:'breed',category:'category',lifeStatus:'life-status',locationLabel:'address',date:'trip-date',description:'description',city:'city',officialIntroduction:'official-introduction'};
 let searching=false;
+const PLACE_CATEGORIES=CATEGORIES.filter(category=>!['在世','失踪','已故'].includes(category));
 function searchControls(){for(const id of ['location-query','location-search-button'])$(id).disabled=!ready||busy||searching;for(const b of $('location-results').querySelectorAll('button'))b.disabled=!ready||busy||searching;}
 function useResult(result,asNew){
   if(busy||searching||!ready)return;
@@ -57,7 +58,7 @@ function options(){
   $('place-select').value=selected||'';drawPins();
 }
 function categoryUI(){for(const button of $('category-picker').children)button.setAttribute('aria-pressed',String(button.dataset.category===categoryOf($('category').value)));}
-for(const category of CATEGORIES){const button=document.createElement('button');button.type='button';button.dataset.category=category;button.append(categoryIcon(category),document.createTextNode(category));button.onclick=()=>{$('category').value=category;dirty=true;categoryUI();};$('category-picker').append(button);}
+for(const category of PLACE_CATEGORIES){const button=document.createElement('button');button.type='button';button.dataset.category=category;button.append(categoryIcon(category),document.createTextNode(category));button.onclick=()=>{$('category').value=category;dirty=true;categoryUI();};$('category-picker').append(button);}
 function ratingUI(){$('rating').dataset.ratingTone=$('rating-value').dataset.ratingTone=ratingTone($('unrated').checked?null:Number($('rating').value));const value=$('unrated').checked?null:Number($('rating').value);$('rating-value').textContent=value===null?'未评分':`${value.toFixed(1)} / 5 ★`;$('rating').disabled=$('unrated').checked;}
 function point(){const x=$('longitude').value,y=$('latitude').value;if(x===''||y==='')return null;const c=[Number(x),Number(y)];return c.every(Number.isFinite)&&c[0]>=105.2&&c[0]<=110.3&&c[1]>=28.1&&c[1]<=32.3?c:null;}
 function choosePoint(c){if(!ready||busy)return;if(c[0]<105.2||c[0]>110.3||c[1]<28.1||c[1]>32.3){$('map-status').textContent='请选择重庆范围内的位置。';return;} $('longitude').value=c[0].toFixed(6);$('latitude').value=c[1].toFixed(6);dirty=true;current.locationPrecision='作者地图选点';delete current.coordinateSource;drawPins();$('map-status').textContent=`已选定：经度 ${c[0].toFixed(6)}，纬度 ${c[1].toFixed(6)}。保存或发布后才会更新。`;}
