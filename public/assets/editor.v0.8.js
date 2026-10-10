@@ -10,9 +10,9 @@ function searchControls(){for(const id of ['location-query','location-search-but
 function useResult(result,asNew){
   if(busy||searching||!ready)return;
   if(asNew){if(!leaveOK())return;createPlace();}
-  else if(!confirm('将更新当前地点的位置，猫咪名字、照片与评价保持不变。继续吗？'))return;
+  else if(!confirm('将更新当前猫咪的遇见位置，猫咪名字、照片与评价保持不变。继续吗？'))return;
   // Search results locate the encounter; they are not the cat's name.
-  // Keep both cat-name fields untouched and only apply place metadata.
+  // Keep the cat name untouched; search results only fill the encounter location metadata.
   $('address').value=result.address||result.name;
   $('region').value=result.region||'';$('city').value=result.city||'';
   $('longitude').value=result.coordinates[0];$('latitude').value=result.coordinates[1];
@@ -24,18 +24,18 @@ function useResult(result,asNew){
 $('location-search-form').onsubmit=async e=>{
   e.preventDefault();if(searching||busy||!ready)return;
   const query=$('location-query').value.trim();if(query.length<2)return;
-  searching=true;searchControls();$('location-results').replaceChildren();$('location-search-status').textContent='正在查找地点…';
+  searching=true;searchControls();$('location-results').replaceChildren();$('location-search-status').textContent='正在查找位置…';
   try{
     const data=await api('/author/api/search?query='+encodeURIComponent(query));
-    $('location-search-status').textContent=data.results.length?`找到 ${data.results.length} 个候选地点，请核对城市和地址。${data.upstreamQuery!==query?'（检索：'+data.upstreamQuery+'）':''}`:'没有找到。试试地点名＋重庆，或在地图上选点。';
+    $('location-search-status').textContent=data.results.length?`找到 ${data.results.length} 个候选位置，请核对城市和地址。${data.upstreamQuery!==query?'（检索：'+data.upstreamQuery+'）':''}`:'没有找到。试试位置名称＋重庆，或在地图上选点。';
     for(const result of data.results){
       const card=document.createElement('article');card.className='location-result';
       const title=document.createElement('strong');title.textContent=result.name;
       const address=document.createElement('p');address.textContent=result.address;
       const actions=document.createElement('div');actions.className='result-actions';
       const existing=allPlaces().find(p=>p.coordinateSource?.url===result.sourceUrl&&result.sourceUrl!=='https://www.openstreetmap.org/copyright');
-      const add=document.createElement('button');add.type='button';add.textContent=existing?'打开已有地点':'选中并新增';add.onclick=()=>{if(existing){if(!busy&&leaveOK()){select(existing.id);focus();}}else useResult(result,true);};
-      const use=document.createElement('button');use.type='button';use.textContent='用于当前地点';use.onclick=()=>useResult(result,false);
+      const add=document.createElement('button');add.type='button';add.textContent=existing?'打开已有猫咪':'定位并新增猫咪';add.onclick=()=>{if(existing){if(!busy&&leaveOK()){select(existing.id);focus();}}else useResult(result,true);};
+      const use=document.createElement('button');use.type='button';use.textContent='用于当前猫咪';use.onclick=()=>useResult(result,false);
       actions.append(add,use);card.append(title,address,actions);$('location-results').append(card);
     }
   }catch(e){$('location-search-status').textContent=e.message;}finally{searching=false;searchControls();}
@@ -52,8 +52,8 @@ function leaveOK(){return !dirty||confirm('当前内容尚未保存，确定切�
 function allPlaces(){return mergeMemories(base,records.filter(r=>r.draft||r.published).map(r=>r.draft||r.published));}
 function options(){
   $('place-select').replaceChildren();
-  for(const p of allPlaces()){const option=document.createElement('option');option.value=p.id;option.textContent=(p.place||p.title)+(records.find(r=>r.id===p.id)?.draft?' · 草稿':'');$('place-select').append(option);}
-  if(current&&!allPlaces().some(p=>p.id===selected)){const option=new Option(current.place||'新地点（未保存）',selected);$('place-select').append(option);}
+  for(const p of allPlaces()){const option=document.createElement('option');option.value=p.id;option.textContent=(p.place||p.title)+(records.find(r=>r.id===p.id)?.draft?' · 猫咪草稿':'');$('place-select').append(option);}
+  if(current&&!allPlaces().some(p=>p.id===selected)){const option=new Option(current.place||'新猫咪（未保存）',selected);$('place-select').append(option);}
   $('place-select').value=selected||'';drawPins();
 }
 function categoryUI(){for(const button of $('category-picker').children)button.setAttribute('aria-pressed',String(button.dataset.category===categoryOf($('category').value)));}
@@ -70,8 +70,8 @@ function select(id,newPlace=null){
   $('unrated').checked=current.review?.rating==null;$('rating').value=current.review?.rating??5;ratingUI();
   reviewCounts();dirty=false;options();renderPhotos();lock(false);showModeration(id,api);
   const published=row?.published||base.find(p=>p.id===id);
-  $('record-status').textContent=row?.draft?'有云端草稿 · 公开版本保持不变':published?'已发布 · 正在编辑副本':'新地点 · 尚未发布';
-  $('published-summary').textContent=published?`${published.place} · ${published.review?.rating==null?'未评分':published.review.rating+' 星'}\n${published.review?.comment||''}`:'保存草稿仅作者可见；发布后才会出现在公开地图。';
+  $('record-status').textContent=row?.draft?'有云端猫咪草稿 · 公开版本保持不变':published?'已发布 · 正在编辑猫咪记录副本':'新猫咪 · 尚未发布';
+  $('published-summary').textContent=published?`${published.place} · ${published.review?.rating==null?'未评分':published.review.rating+' 星'}\n${published.review?.comment||''}`:'保存草稿仅作者可见；发布后猫咪记录才会出现在公开地图。';
   $('public-link').hidden=!published;$('public-link').href=`/#place=${encodeURIComponent(id)}`;
   if(street&&point())street.flyTo({center:point(),zoom:14});drawPins();
 }
@@ -96,13 +96,13 @@ async function load(){
     const requested=new URL(location.href).searchParams.get('place');
     const id=[selected,requested,allPlaces()[0]?.id].find(id=>allPlaces().some(p=>p.id===id));
     if(id)select(id);else createPlace();
-    message('已连接云端。可以新增地点、在地图上选点，并保存草稿或发布。');
+    message('已连接云端。可以新增猫咪、定位遇见位置，并保存草稿或发布。');
   }catch(e){message(e.message,true);}finally{lock(false);}
 }
-function createPlace(){select('place-'+crypto.randomUUID(),{place:'',title:'',region:'chongqing',coordinates:null,photos:[],review:{author:'竹喵',rating:null,comment:''}});dirty=true;$('location-query').focus();message('请先搜索地名并选择候选地点，位置会自动填写。');}
+function createPlace(){select('place-'+crypto.randomUUID(),{place:'',title:'',region:'chongqing',coordinates:null,photos:[],review:{author:'竹喵',rating:null,comment:''}});dirty=true;$('location-query').focus();message('请先定位遇见位置，位置会自动填写，再填写猫咪名字。');}
 async function save(action){
   if(busy||!ready)return;
-  if(action!=='discard-draft'&&!point()){message('请先搜索并选择地点，或在地图上点选位置。',true);$('location-query').focus();return;}
+  if(action!=='discard-draft'&&!point()){message('请先定位遇见位置，或在地图上点选位置。',true);$('location-query').focus();return;}
   if(action!=='discard-draft'&&!$('place-form').reportValidity())return;
   const row=records.find(r=>r.id===selected);const content=draft();lock(true);message('正在保存到云端，请稍等…');
   try{
@@ -112,7 +112,7 @@ async function save(action){
     // Empty discarded new drafts remain a private tombstone for concurrency safety.
     select(selected,data.record.draft||data.record.published||base.find(p=>p.id===selected)||content);
     dirty=!data.record.draft&&!data.record.published&&!base.some(p=>p.id===selected);
-    message(action==='publish'?'已发布！公开地图会显示这个地点、照片及评分。':action==='draft'?'云端草稿已保存，公开地图未改变。':'云端草稿已丢弃。');
+    message(action==='publish'?'已发布！公开地图会显示这只猫咪、遇见位置、照片及评分。':action==='draft'?'云端猫咪草稿已保存，公开地图未改变。':'云端草稿已丢弃。');
   }catch(e){message(e.message+' 当前输入已保留。',true);}finally{lock(false);ratingUI();}
 }
 function previewSrc(src){return src.startsWith('/api/photos/')?'/author/api/photo?id='+encodeURIComponent(src.split('/').at(-1)):src.replace(/^\.\//,'/');}
@@ -167,11 +167,11 @@ async function readPhotoGps(file){
 }
 function distanceMeters(a,b){const r=Math.PI/180,lat=(a[1]+b[1])/2*r;return Math.hypot((a[0]-b[0])*Math.cos(lat)*111320,(a[1]-b[1])*110540);}
 let pendingPhotoGroups=[];
-function renderPhotoSeries(groups){const box=$('photo-series'),list=$('photo-series-list');if(!groups.length){box.hidden=true;return;}pendingPhotoGroups=groups;box.hidden=false;list.replaceChildren();groups.forEach((g,i)=>{const row=document.createElement('div');row.className='photo-series-row';const name=document.createElement('input');name.value=g.name=g.gps?`重庆 · 地点系列 ${String(i+1).padStart(2,'0')}`:'未定位照片 · 待补充地点';name.setAttribute('aria-label',`第 ${i+1} 个系列名称`);name.oninput=()=>g.name=name.value;const meta=document.createElement('small');meta.textContent=`${g.files.length} 张照片${g.gps?` · ${g.gps[1].toFixed(5)}，${g.gps[0].toFixed(5)}`:' · 无 GPS'}`;row.append(name,meta);list.append(row);});}
-async function uploadPhotoGroups(){if(!pendingPhotoGroups.length||busy)return;const groups=pendingPhotoGroups;pendingPhotoGroups=[];lock(true);try{let index=0;for(const group of groups){for(const file of group.files){index++;message(`正在上传第 ${index} 张照片…`);const p=await compress(file),result=await api('/author/api/photo',{data:p.data});photos.push({...result.photo,width:p.width,height:p.height,caption:'',alt:''});}if(group===groups[0]&&group.gps){const [lon,lat]=group.gps;$('longitude').value=lon.toFixed(6);$('latitude').value=lat.toFixed(6);$('region').value='chongqing';$('city').value='重庆市';$('address').value=`${group.name} · 照片 GPS`;current.locationPrecision='照片 EXIF GPS';current.coordinateSource={name:'照片 EXIF GPS'};dirty=true;drawPins();}}renderPhotos();$('photo-series').hidden=true;message(`照片已上传，已整理为 ${groups.length} 个系列。系列名称已保留在本次清单中，请核对地点后保存。`);}catch(e){message(e.message+' 已完成的照片保留在当前相册。',true);}finally{lock(false);ratingUI();}}
+function renderPhotoSeries(groups){const box=$('photo-series'),list=$('photo-series-list');if(!groups.length){box.hidden=true;return;}pendingPhotoGroups=groups;box.hidden=false;list.replaceChildren();groups.forEach((g,i)=>{const row=document.createElement('div');row.className='photo-series-row';const name=document.createElement('input');name.value=g.name=g.gps?`重庆 · 猫咪系列 ${String(i+1).padStart(2,'0')}`:'未定位照片 · 待补充遇见位置';name.setAttribute('aria-label',`第 ${i+1} 个系列名称`);name.oninput=()=>g.name=name.value;const meta=document.createElement('small');meta.textContent=`${g.files.length} 张照片${g.gps?` · ${g.gps[1].toFixed(5)}，${g.gps[0].toFixed(5)}`:' · 无 GPS'}`;row.append(name,meta);list.append(row);});}
+async function uploadPhotoGroups(){if(!pendingPhotoGroups.length||busy)return;const groups=pendingPhotoGroups;pendingPhotoGroups=[];lock(true);try{let index=0;for(const group of groups){for(const file of group.files){index++;message(`正在上传第 ${index} 张照片…`);const p=await compress(file),result=await api('/author/api/photo',{data:p.data});photos.push({...result.photo,width:p.width,height:p.height,caption:'',alt:''});}if(group===groups[0]&&group.gps){const [lon,lat]=group.gps;$('longitude').value=lon.toFixed(6);$('latitude').value=lat.toFixed(6);$('region').value='chongqing';$('city').value='重庆市';$('address').value=`${group.name} · 照片 GPS`;current.locationPrecision='照片 EXIF GPS';current.coordinateSource={name:'照片 EXIF GPS'};dirty=true;drawPins();}}renderPhotos();$('photo-series').hidden=true;message(`照片已上传，已整理为 ${groups.length} 个系列。系列名称已保留在本次清单中，请核对遇见位置后保存。`);}catch(e){message(e.message+' 已完成的照片保留在当前相册。',true);}finally{lock(false);ratingUI();}}
 $('photos').addEventListener('change',async e=>{
   const files=[...e.target.files];e.target.value='';if(!files.length||busy)return;
-  if(photos.length+files.length>15){message('每个地点最多 15 张照片，请减少本次选择的数量。',true);return;}
+  if(photos.length+files.length>15){message('每只猫咪最多 15 张照片，请减少本次选择的数量。',true);return;}
   try{const groups=[];for(let i=0;i<files.length;i++){message(`正在读取照片 ${i+1}/${files.length}…`);const gps=await readPhotoGps(files[i]);const valid=gps&&gps[0]>=105.2&&gps[0]<=110.3&&gps[1]>=28.1&&gps[1]<=32.3;let group=valid&&groups.find(g=>g.gps&&distanceMeters(g.gps,gps)<=500);if(!group){group={gps:valid?gps:null,files:[]};groups.push(group);}group.files.push(files[i]);}renderPhotoSeries(groups);}catch(e){message(e.message,true);}
 });
 $('confirm-photo-series').onclick=uploadPhotoGroups;
@@ -180,7 +180,7 @@ for(const id of ['longitude','latitude'])$(id).addEventListener('input',()=>{cur
 $('place-select').addEventListener('change',e=>{if(leaveOK())select(e.target.value);else e.target.value=selected;});
 $('new-place').onclick=()=>{if(!busy&&leaveOK())createPlace();};$('reload').onclick=()=>{if(!busy&&leaveOK())load();};
 $('place-form').onsubmit=e=>{e.preventDefault();save('publish');};$('save-draft').onclick=()=>save('draft');
-$('discard').onclick=()=>{if(confirm('丢弃这个地点的云端草稿及当前未保存修改？已发布版本不会改变。'))save('discard-draft');};
+$('discard').onclick=()=>{if(confirm('丢弃这个猫咪的云端草稿及当前未保存修改？已发布版本不会改变。'))save('discard-draft');};
 $('backup').onclick=()=>{if(!current)return;const blob=new Blob([JSON.stringify(draft(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`${selected}-backup.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 window.addEventListener('beforeunload',e=>{if(dirty||busy){e.preventDefault();e.returnValue='';}});
 
@@ -188,7 +188,7 @@ window.addEventListener('beforeunload',e=>{if(dirty||busy){e.preventDefault();e.
 let view={x:105.2,y:project([0,32.3])[1],w:5.1,h:project([0,28.1])[1]-project([0,32.3])[1]},street=null,modeToken=0;
 function renderMap(){$('overview').setAttribute('viewBox',`${view.x} ${view.y} ${view.w} ${view.h}`);drawPins();}
 function drawPins(){
-  $('selected-location').textContent=point()?`已定位：${$('place-name').value||'地图选点'} · ${$('address').value||'可在地图上微调'}`:'请先搜索并选择地点，也可以在地图上点选。';
+  $('selected-location').textContent=point()?`已定位：${$('place-name').value||'地图选点'} · ${$('address').value||'可在地图上微调'}`:'请先定位遇见位置，也可以在地图上点选。';
   const c=point();$('current-pin').toggleAttribute('hidden',!c||!!street);$('street-pin').hidden=!c||!street;
   const unit=1/($('overview').getScreenCTM()?.a||25);
   if(c){const p=project(c);$('current-pin').setAttribute('cx',p[0]);$('current-pin').setAttribute('cy',p[1]);$('current-pin').setAttribute('r',6*unit);$('current-pin').style.strokeWidth=2*unit;if(street){const s=street.project(c);$('street-pin').style.left=s.x+'px';$('street-pin').style.top=s.y+'px';}}

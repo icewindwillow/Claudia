@@ -21,7 +21,7 @@ const idOK = id => typeof id === 'string' && /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,99}$/.
 export const photoID = src => typeof src === 'string' && /^\/api\/photos\/([a-f0-9-]{36})$/.exec(src)?.[1];
 const asset = src => typeof src === 'string' && /^(?:\.\/|\/)assets\/[a-zA-Z0-9_./-]+\.(?:jpe?g|png|webp|avif)$/i.test(src) && !src.includes('..');
 export function validatePlace(input, id) {
-  if (!input || typeof input !== 'object' || Array.isArray(input) || input.id !== id || !idOK(id)) bad('地点标识不正确。');
+  if (!input || typeof input !== 'object' || Array.isArray(input) || input.id !== id || !idOK(id)) bad('猫咪记录标识不正确。');
   const out = {id, placeId:id};
   for (const [key,max] of Object.entries({place:160,placeEn:160,title:160,description:10000,officialIntroduction:10000,officialSource:2000,city:120,date:10,region:24,category:80,lifeStatus:20,locationLabel:200,locationPrecision:200})) {
     const value = input[key] ?? '';
@@ -29,11 +29,11 @@ export function validatePlace(input, id) {
     out[key] = value.trim();
   }
   if(out.officialSource){let url;try{url=new URL(out.officialSource);}catch{bad('官方来源须为有效 HTTPS 链接。');}if(url.protocol!=='https:'||url.username||url.password)bad('官方来源须为 HTTPS 链接。');}
-  if (!out.place) bad('请填写地点名称。');
+  if (!out.place) bad('请填写猫咪名字。');
   if (!['在世','失踪','已故'].includes(out.lifeStatus)) out.lifeStatus='在世';
   out.title ||= out.place;
   if (!['chongqing'].includes(out.region)) bad('请选择所属地区。');
-  if (out.date && (!/^\d{4}-\d{2}-\d{2}$/.test(out.date) || !Number.isFinite(Date.parse(out.date)) || new Date(out.date).toISOString().slice(0,10) !== out.date)) bad('旅行日期不正确。');
+  if (out.date && (!/^\d{4}-\d{2}-\d{2}$/.test(out.date) || !Number.isFinite(Date.parse(out.date)) || new Date(out.date).toISOString().slice(0,10) !== out.date)) bad('撸猫日期不正确。');
   const c = input.coordinates;
   if (input.visitDates != null) {
     if (!Array.isArray(input.visitDates) || input.visitDates.length > 100 || !input.visitDates.every(d => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d) && Number.isFinite(Date.parse(d)) && new Date(d).toISOString().slice(0,10) === d)) bad('其他到访日期请使用 YYYY-MM-DD，用逗号分隔。');
@@ -44,7 +44,7 @@ export function validatePlace(input, id) {
   const r = input.review;
   if (!r || typeof r.author !== 'string' || r.author.length > 80 || typeof r.comment !== 'string' || r.comment.length > 10000 || !(r.rating === null || (typeof r.rating === 'number' && Number.isFinite(r.rating) && r.rating >= 0 && r.rating <= 5 && Number.isInteger(r.rating*2)))) bad('署名、评价或半星评分格式不正确。');
   out.review = {author:r.author.trim(),rating:r.rating,comment:r.comment};
-  if (!Array.isArray(input.photos) || input.photos.length > 15) bad('每个地点最多 15 张照片。');
+  if (!Array.isArray(input.photos) || input.photos.length > 15) bad('每只猫咪最多 15 张照片。');
   out.photos = input.photos.map(p => {
     if (!p || !(asset(p.src) || photoID(p.src))) bad('照片必须来自本站相册。');
     const result = {src:p.src};
@@ -53,7 +53,7 @@ export function validatePlace(input, id) {
     for (const key of ['width','height']) if (Number.isInteger(p[key]) && p[key] > 0 && p[key] <= 30000) result[key] = p[key];
     return result;
   });
-  if (input.aliases != null) { if (!Array.isArray(input.aliases) || input.aliases.length > 30 || !input.aliases.every(v=>typeof v==='string' && v.length<=160)) bad('地点别名格式不正确。'); out.aliases = input.aliases; }
+  if (input.aliases != null) { if (!Array.isArray(input.aliases) || input.aliases.length > 30 || !input.aliases.every(v=>typeof v==='string' && v.length<=160)) bad('猫咪别名格式不正确。'); out.aliases = input.aliases; }
   // Preserve provenance of bundled locations as data, never executable markup.
   if (input.coordinateSource && typeof input.coordinateSource === 'object') {
     out.coordinateSource = {};
@@ -74,7 +74,7 @@ export async function mutatePlace(env, body, author) {
     const change = body.action==='publish' ? 'published=?,draft=NULL' : 'draft=?';
     row = await db.prepare(`UPDATE map_places SET ${change},revision=revision+1,updated_at=?,updated_by=? WHERE id=? AND revision=? RETURNING *`).bind(payload,now,author.email,body.id,body.revision).first();
   }
-  if (!row) throw new HttpError(409,'REVISION_CONFLICT','另一位作者已更新此地点。输入已保留，请先备份，再读取云端最新版。');
+  if (!row) throw new HttpError(409,'REVISION_CONFLICT','另一位作者已更新这只猫咪的记录。输入已保留，请先备份，再读取云端最新版。');
   return record(row);
 }
 export async function uploadPhoto(env, body) {

@@ -138,9 +138,9 @@ function renderOverlays(){
       $('marker-layer').append(el);markerEls.set(key,el);
     }
     el._items=g.items;el.style.left=`${g.x}px`;el.style.top=`${g.y}px`;el.classList.toggle('cluster',ids.length>1);el.classList.toggle('is-selected',ids.includes(state.selected?.id));
-    el.setAttribute('aria-label',ids.length>1?`展开 ${ids.length} 个地点：${g.items.map(m=>m.place).join('、')}`:`${g.items[0].place||g.items[0].title}，${g.items[0].demo?'演示地点':'阅读故事'}`);
-    const dot=el.querySelector('.pin-dot');dot.replaceChildren();el.dataset.ratingTone=ids.length===1?ratingTone(g.items[0].review?.rating):'unrated';if(ids.length>1)dot.textContent=String(ids.length);else{dot.append(categoryIcon(g.items[0].category));el.setAttribute('aria-label',`${g.items[0].place}，${categoryOf(g.items[0].category)}，${g.items[0].review?.rating==null?'尚未评分':g.items[0].review.rating+' 星'}，阅读故事`);}
-    const label=el.querySelector('.pin-label');label.replaceChildren(text('span','',ids.length>1?`${ids.length} 个地点`:(g.items[0].place||g.items[0].title)));
+    el.setAttribute('aria-label',ids.length>1?`展开 ${ids.length} 只猫咪：${g.items.map(m=>m.place).join('、')}`:`${g.items[0].place||g.items[0].title}，${g.items[0].demo?'演示猫咪':'查看猫咪记录'}`);
+    const dot=el.querySelector('.pin-dot');dot.replaceChildren();el.dataset.ratingTone=ids.length===1?ratingTone(g.items[0].review?.rating):'unrated';if(ids.length>1)dot.textContent=String(ids.length);else{dot.append(categoryIcon(g.items[0].category));el.setAttribute('aria-label',`${g.items[0].place}，${categoryOf(g.items[0].category)}，${g.items[0].review?.rating==null?'尚未评分':g.items[0].review.rating+' 星'}，查看猫咪记录`);}
+    const label=el.querySelector('.pin-label');label.replaceChildren(text('span','',ids.length>1?`${ids.length} 只猫咪`:(g.items[0].place||g.items[0].title)));
     if(ids.length===1&&g.items[0].placeEn)label.append(text('small','',g.items[0].placeEn));
     const labelW=label.offsetWidth||100,labelH=label.offsetHeight||28;
     let candidates=[[21,-labelH/2],[-labelW-21,-labelH/2],[-labelW/2,-labelH-22],[-labelW/2,23]];
@@ -163,28 +163,28 @@ function expandCluster(items){
   if(state.online){const b=new GeoBounds();items.forEach(m=>b.extend(m.coordinates));streetMap.fitBounds(b,{padding:95,maxZoom:19,duration:reduced?0:650});}
   else atlas.fit(items);
 }
-const clusterDialog=document.createElement('dialog');clusterDialog.className='cluster-dialog';clusterDialog.setAttribute('aria-label','选择聚合地点');document.body.append(clusterDialog);
-function showCluster(items){clusterDialog.replaceChildren();const heading=text('h2','',`${items.length} 个相邻或同址地点`),note=text('p','','这些地点保留各自坐标。请选择要查看的记录。'),close=text('button','cluster-close','关闭');close.type='button';close.onclick=()=>clusterDialog.close();clusterDialog.append(heading,note,close);for(const m of items){const button=text('button','cluster-choice');button.type='button';button.append(categoryIcon(m.category),text('span','',m.place),text('small','',m.placeEn||''));button.onclick=()=>{clusterDialog.close();openStory(m);};clusterDialog.append(button);}clusterDialog.showModal();}
-function resetView(){closeStory(false);$('map-context').replaceChildren(document.createTextNode('重庆全览 ／ 猫咪地点'));if(state.online)streetMap.fitBounds([[MAP_BOUNDS[0],MAP_BOUNDS[1]],[MAP_BOUNDS[2],MAP_BOUNDS[3]]],{padding:{top:90,bottom:65,left:40,right:50},duration:reduced?0:700});else atlas.reset();}
+const clusterDialog=document.createElement('dialog');clusterDialog.className='cluster-dialog';clusterDialog.setAttribute('aria-label','选择聚合猫咪');document.body.append(clusterDialog);
+function showCluster(items){clusterDialog.replaceChildren();const heading=text('h2','',`${items.length} 只相邻或同址猫咪`),note=text('p','','这些猫咪保留各自的遇见位置。请选择要查看的记录。'),close=text('button','cluster-close','关闭');close.type='button';close.onclick=()=>clusterDialog.close();clusterDialog.append(heading,note,close);for(const m of items){const button=text('button','cluster-choice');button.type='button';button.append(categoryIcon(m.category),text('span','',m.place),text('small','',m.placeEn||''));button.onclick=()=>{clusterDialog.close();openStory(m);};clusterDialog.append(button);}clusterDialog.showModal();}
+function resetView(){closeStory(false);$('map-context').replaceChildren(document.createTextNode('重庆全览 ／ 猫咪分布'));if(state.online)streetMap.fitBounds([[MAP_BOUNDS[0],MAP_BOUNDS[1]],[MAP_BOUNDS[2],MAP_BOUNDS[3]]],{padding:{top:90,bottom:65,left:40,right:50},duration:reduced?0:700});else atlas.reset();}
 function refreshCollection(){
   state.items=[...state.real];
   const citySelection=$('city-filter').value;const cities=[...new Set(state.items.map(m=>m.city).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh-CN'));$('city-filter').replaceChildren(new Option('全部城市','all'),...cities.map(c=>new Option(c,c)),new Option('城市待确认','pending'));$('city-filter').value=cities.includes(citySelection)||citySelection==='pending'?citySelection:'all';
   state.filtered=sortMemories(filterMemories(state.items,state.region,state.query).filter(m=>$('city-filter').value==='all'||($('city-filter').value==='pending'?!m.city:m.city===$('city-filter').value)).filter(m=>$('category-filter').value==='all'||categoryOf(m.category)===$('category-filter').value),$('rating-sort').value);
   const demoOnly=state.items.length>0&&state.items.every(m=>m.demo);
   const count=new Set(state.items.map(m=>m.place?.trim()).filter(Boolean)).size;
-  $('place-count').textContent=String(count).padStart(2,'0');$('place-count').nextElementSibling.textContent=demoOnly?'收录地点':'收录地点';$('memory-count').textContent=String(state.real.length).padStart(2,'0');
-  $('map-key-label').textContent=demoOnly?'演示地点':state.items.some(m=>m.demo)?'真实与演示地点':'猫咪地点';
+  $('place-count').textContent=String(count).padStart(2,'0');$('place-count').nextElementSibling.textContent=demoOnly?'演示猫咪':'收录猫咪';$('memory-count').textContent=String(state.real.length).padStart(2,'0');
+  $('map-key-label').textContent=demoOnly?'演示猫咪':state.items.some(m=>m.demo)?'真实与演示猫咪':'猫咪分布';
   $('result-count').textContent=`${String(state.filtered.length).padStart(2,'0')} 个条目`;
   const f=document.createDocumentFragment();
   state.filtered.forEach((m,i)=>{
     const row=text('button','memory-row');row.type='button';row.dataset.id=m.id;row.dataset.category=categoryOf(m.category);row.dataset.ratingTone=ratingTone(m.review?.rating);row.setAttribute('aria-pressed',String(state.selected?.id===m.id));
     const photos=photosOf(m);
     if(photos.length){const thumb=document.createElement('img');thumb.className='row-photo';thumb.src=photoSrc(photos[0].thumbnail||photos[0].src);thumb.alt='';thumb.loading='lazy';row.append(thumb);}else {const mark=text('span','row-category-mark');mark.append(categoryIcon(m.category));row.append(mark);}
-    const body=text('span','row-body');const title=text('span','row-title');title.append(text('strong','',m.place||'地点待补'));if(m.placeEn)title.append(text('small','',m.placeEn));body.append(title,text('span','row-sub',[m.city||'',m.category,m.demo?'演示':m.date,!m.coordinates?'定位待补':''].filter(Boolean).join(' · ')));
+    const body=text('span','row-body');const title=text('span','row-title');title.append(text('strong','',m.place||'猫咪名字待补'));if(m.placeEn)title.append(text('small','',m.placeEn));body.append(title,text('span','row-sub',[m.city||'',m.category,m.lifeStatus&&m.lifeStatus!=='在世'?m.lifeStatus:'',m.demo?'演示':m.date,!m.coordinates?'定位待补':''].filter(Boolean).join(' · ')));
     body.querySelector('.row-sub').prepend(categoryIcon(m.category));
     if(m.review||photos.length){const meta=text('span','row-review');if(m.review){const rating=text('span','rating-display');renderRating(rating,m.review.rating,{compact:true});meta.append(rating);}if(photos.length)meta.append(text('span','row-photo-count',`${photos.length} 张照片`));body.append(meta);}row.append(body);const arrow=icon('arrow');arrow.classList.add('row-arrow');row.append(arrow);row.addEventListener('click',()=>openStory(m,row));f.append(row);
   });
-  if(!state.filtered.length){const e=text('div','empty-state');e.append(text('strong','',state.query?'还没找到这个地点。':'暂无地点'),document.createTextNode(state.query?'试试别的名字。这里只搜索已经收录的内容。':state.items.length?'这个地区暂时没有记录。':'作者登录后可添加猫咪地点。'));f.append(e);}
+  if(!state.filtered.length){const e=text('div','empty-state');e.append(text('strong','',state.query?'还没找到这只猫。':'暂无猫咪'),document.createTextNode(state.query?'试试别的名字。这里只搜索已经收录的猫咪。':state.items.length?'这个地区暂时没有猫咪记录。':'作者登录后可添加猫咪记录。'));f.append(e);}
   document.querySelectorAll('#category-filters [data-category]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.category===($('category-filter').value||'all'))));
   document.querySelectorAll('#sort-buttons [data-sort]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.sort===$('rating-sort').value)));
   $('memory-list').replaceChildren(f);
@@ -206,21 +206,21 @@ function openStory(m,trigger=null){
   showGuests(m.id);
   const panel=$('story-panel');
   if(trigger)lastFocus=trigger;else if(!panel.open)lastFocus=document.activeElement;
-  $('story-kind').textContent=m.demo?'DEMO POSTCARD / 演示卡片':'地点相册';
+  $('story-kind').textContent=m.demo?'DEMO POSTCARD / 演示卡片':'猫咪相册';
   $('story-category').replaceChildren(categoryIcon(m.category),document.createTextNode(categoryOf(m.category)));
-  $('story-region').textContent=[m.locationLabel||REGIONS[m.region],m.category,(m.visitDates?.length?m.visitDates.join(' · '):m.date)].filter(Boolean).join(' · ');
-  $('story-place').replaceChildren(document.createTextNode(m.place||'地点待补'));if(m.placeEn)$('story-place').append(text('small','',m.placeEn));
+  $('story-region').textContent=[m.locationLabel||'遇见位置待补',m.category,m.lifeStatus&&m.lifeStatus!=='在世'?m.lifeStatus:'',(m.visitDates?.length?m.visitDates.join(' · '):m.date)].filter(Boolean).join(' · ');
+  $('story-place').replaceChildren(document.createTextNode(m.place||'猫咪名字待补'));if(m.placeEn)$('story-place').append(text('small','',m.placeEn));
   $('story-writing').hidden=!m.description;$('read-long-review').hidden=!m.description;$('story-scroll').scrollTop=0;$('story-title').hidden=!m.title||m.title===m.place;
   $('story-title').textContent=m.title;$('story-description').textContent=m.description||'';
   $('review-author').textContent=m.review?.author||'';renderRating($('story-rating'),m.review?.rating);
   $('review-comment').textContent=m.review?.comment||'';$('review-comment').hidden=!m.review?.comment;$('review-empty').hidden=!!m.review?.comment;
-  $('story-location').textContent=m.coordinates?`${m.locationPrecision||'记录坐标'}\n${Math.abs(m.coordinates[1]).toFixed(4)}° ${m.coordinates[1]>=0?'N':'S'} · ${Math.abs(m.coordinates[0]).toFixed(4)}° ${m.coordinates[0]>=0?'E':'W'}`:'地址待补充';
+  $('story-location').textContent=[m.locationLabel||m.address,m.coordinates?`${m.locationPrecision||'记录坐标'}\n${Math.abs(m.coordinates[1]).toFixed(4)}° ${m.coordinates[1]>=0?'N':'S'} · ${Math.abs(m.coordinates[0]).toFixed(4)}° ${m.coordinates[0]>=0?'E':'W'}`:'遇见位置待补充'].filter(Boolean).join('\n');
   $('story-location').style.whiteSpace='pre-line';$('story-disclaimer').hidden=!m.demo;$('story-street').hidden=!m.coordinates;$('story-author').hidden=!!m.demo;
   renderAlbum();
   const i=state.filtered.findIndex(x=>x.id===m.id);$('story-index').textContent=`${String(i+1).padStart(2,'0')} / ${String(state.filtered.length).padStart(2,'0')}`;$('previous-story').disabled=i<=0;$('next-story').disabled=i>=state.filtered.length-1;
   if(!panel.open)panel.showModal();panel.scrollTop=0;document.documentElement.classList.add('has-story');
   document.querySelectorAll('.memory-row').forEach(row=>row.setAttribute('aria-pressed',String(row.dataset.id===m.id)));
-  $('map-context').textContent=[m.place,m.placeEn,m.demo?'演示地点':'猫咪地点'].filter(Boolean).join(' ／ ');
+  $('map-context').textContent=[m.place,m.placeEn,m.demo?'演示猫咪':'猫咪记录'].filter(Boolean).join(' ／ ');
   try{history.replaceState(null,'',`#place=${encodeURIComponent(m.id)}`);}catch{/* sandboxed/file previews may restrict history */}
   if(m.coordinates){if(state.online)streetMap.flyTo({center:m.coordinates,zoom:11,padding:{top:30,bottom:20,left:0,right:0},duration:reduced?0:850});else atlas.focus(m.coordinates,2.8);}
   $('story-place').focus({preventScroll:true});renderOverlays();
@@ -425,7 +425,7 @@ async function refreshCloudReviews(){
     const base=mergeMemories(state.seed||[],state.saved||[]).map(m=>entries.has(m.id)?{...m,review:entries.get(m.id).review}:m);
     const placesResponse=await fetch('/api/places',{cache:'no-store',signal:AbortSignal.timeout(10000)});
     const placesData=await placesResponse.json();
-    if(!placesResponse.ok||!placesData.ok)throw new Error('云端地点暂不可用');
+    if(!placesResponse.ok||!placesData.ok)throw new Error('云端猫咪记录暂不可用');
     state.real=mergeMemories(base,validateMemories(placesData)).map(normalizeCategory);
     const selected=state.selected?.id;
     refreshCollection();
@@ -439,7 +439,7 @@ window.addEventListener('pageshow',e=>{if(e.persisted)refreshCloudReviews();});
 async function boot(){
   atlas=new OverviewMap();atlas.resize();
   const results=await Promise.allSettled([readJson('./data/chongqing-overview.geojson','geography')]);
-  if(results[0].status==='fulfilled'){try{atlas.setGeography(results[0].value);notify('暂无猫咪地点，作者登录后可以添加。',4800);}catch(e){notify(e.message,0);}}
+  if(results[0].status==='fulfilled'){try{atlas.setGeography(results[0].value);notify('暂无猫咪记录，作者登录后可以添加。',4800);}catch(e){notify(e.message,0);}}
   else notify('总览数据未能读取。请确认 public/data 已完整上传；直接打开请使用单文件预览版。',0);
   await loadStories(true);document.documentElement.dataset.state='ready';
   const match=location.hash.match(/^#place=(.+)$/);if(match){let id;try{id=decodeURIComponent(match[1]);}catch{}const m=state.items.find(m=>m.id===id);if(m)openStory(m);}

@@ -5,7 +5,7 @@
 - 新仓库：`icewindwillow/Claudia`
 - 本地预览：`npm run dev`
 - 检查：`npm run check`
-- 当前地图覆盖重庆，区县总览与街道瓦片使用 WGS84 坐标；猫咪地点从空白开始。原英国记录保留在历史提交中，不展示。
+- 当前地图覆盖重庆，区县总览与街道瓦片使用 WGS84 坐标；猫咪记录从空白开始；每条记录以猫咪为核心，遇见地点、地址和坐标作为猫咪属性。原英国记录保留在历史提交中，不展示。
 - 如需上线，在 Cloudflare Pages 新建项目并连接新仓库，输出目录填写 `public`。作者后台需单独配置 D1 数据库、Cloudflare Access 与作者邮箱，勿绑定原地图数据库。
 - 不复制旧项目的部署环境、密钥或线上数据库。
 
@@ -32,7 +32,7 @@ map/                         ← Git 仓库根目录
 │   │   ├── style.css
 │   │   └── favicon.svg
 │   └── data/
-│       ├── memories.json    ← 真实故事；已有内容时请保留你自己的版本
+│       ├── memories.json    ← 真实猫咪记录；已有内容时请保留你自己的版本
 │       ├── demos.json       ← 8 个独立的演示地点
 │       ├── uk-overview.geojson
 │       ├── SOURCES.txt
