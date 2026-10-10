@@ -22,7 +22,9 @@ export async function onRequest(context) {
     if(url.pathname==='/author/api/guest-review/delete'&&request.method==='POST'){await requireWrite(request,env);return json({ok:true,...await deleteVisitor(env,await limitedJson(request,2048),author)});}
 
     if(url.pathname==='/author/api/search' && (request.method==='GET'||request.method==='POST')) {
-      await requireWrite(request,env);
+      // Searching is read-only. GET requests must only require the author
+      // Access token; CSRF protection remains required for POST mutations.
+      if(request.method==='POST')await requireWrite(request,env);
       const body=request.method==='GET'?{query:url.searchParams.get('query')||''}:await limitedJson(request,2048);
       return json({ok:true,...await searchPlaces(env,body)});
     }
