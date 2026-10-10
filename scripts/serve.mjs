@@ -1,5 +1,7 @@
 /** Local preview only. Binds to loopback; not a production server. */
 import http from "node:http";
+import {onRequest as mapConfig} from "../functions/api/maps.js";
+import {serveTile} from "../server/tiles.mjs";
 import { readFile, realpath, stat } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -16,6 +18,13 @@ const server = http.createServer(async (req, res) => {
     let pathname;
     try { pathname = decodeURIComponent(new URL(req.url, "http://localhost").pathname); }
     catch { res.writeHead(400).end("Bad request"); return; }
+    if (pathname === '/api/maps' || pathname.startsWith('/api/tiles/')) {
+      const request = new Request(`http://127.0.0.1:${port}${req.url}`, {method:req.method, headers:req.headers});
+      const response = pathname === '/api/maps' ? mapConfig({request}) : await serveTile({request}, {cache:null});
+      res.writeHead(response.status, Object.fromEntries(response.headers));
+      res.end(req.method === 'HEAD' ? undefined : Buffer.from(await response.arrayBuffer()));
+      return;
+    }
     const target = path.resolve(root, "." + pathname);
     if (pathname.includes("\0") || !isWithinRoot(target) || pathname.split("/").some((part) => part.startsWith(".") || part === "_headers" || part === "_redirects")) { res.writeHead(404).end("Not found"); return; }
     let file;
@@ -40,4 +49,4 @@ const server = http.createServer(async (req, res) => {
   }
 });
 server.on("error", (error) => { console.error(`Cannot start preview: ${error.message}`); process.exitCode = 1; });
-server.listen(port, "127.0.0.1", () => console.log(`STATIC preview only: http://127.0.0.1:${port} (No Functions / Access / D1; Ctrl+C to stop)`));
+server.listen(port, "127.0.0.1", () => console.log(`Local preview: http://127.0.0.1:${port} (Street map enabled; author Access / D1 require Cloudflare; Ctrl+C to stop)`));
