@@ -4,6 +4,7 @@ import {project,unproject,featurePath,mergeMemories,photosOf} from './geo.v0.5.j
 import {StreetMap,readStreetConfig} from './streets.v0.4.js';
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 let base=[],records=[],selected=null,current=null,photos=[],csrf='',busy=false,dirty=false,ready=false;
+let mobileStartVisible=false;
 const fields={place:'place-name',placeEn:'place-en',region:'region',breed:'breed',category:'category',lifeStatus:'life-status',locationLabel:'address',date:'trip-date',description:'description',city:'city',officialIntroduction:'official-introduction'};
 let searching=false;
 const PLACE_CATEGORIES=CATEGORIES.filter(category=>!['在世','失踪','已故'].includes(category));
@@ -42,6 +43,35 @@ $('location-search-form').onsubmit=async e=>{
   }catch(e){$('location-search-status').textContent=e.message;}finally{searching=false;searchControls();}
 };
 function message(value,error=false){$('message').textContent=value;$('message').classList.toggle('error',error);}
+function isMobileViewport(){return window.matchMedia('(max-width: 760px)').matches;}
+function mobileRecords(){return allPlaces().filter(p=>p?.id).sort((a,b)=>String(a.place||a.title||'').localeCompare(String(b.place||b.title||''),'zh-CN'));}
+function renderMobileEditOptions(){
+  const selectEl=$('mobile-edit-select');selectEl.replaceChildren();
+  const places=mobileRecords();
+  if(!places.length){selectEl.append(new Option('还没有可修改的猫咪记录',''));selectEl.disabled=true;$('mobile-edit-continue').disabled=true;$('mobile-start-status').textContent='目前还没有可修改的猫咪记录，请先添加一只猫咪。';return;}
+  selectEl.append(new Option('请选择一只猫咪',''));
+  for(const place of places){
+    const status=place.lifeStatus&&place.lifeStatus!=='在世'?` · ${place.lifeStatus}`:'';
+    const meta=place.breed?` · ${place.breed}`:'';
+    const option=new Option(`${place.place||place.title||'未命名猫咪'}${meta}${status}`,place.id);
+    selectEl.append(option);
+  }
+  selectEl.disabled=false;$('mobile-edit-continue').disabled=true;
+}
+function setMobileStart(visible){
+  mobileStartVisible=visible;
+  document.body.classList.toggle('mobile-starting',visible);
+  $('mobile-start').hidden=!visible;
+  if(visible){
+    $('mobile-edit-panel').hidden=true;
+    $('mobile-start-status').textContent='';
+    renderMobileEditOptions();
+    $('mobile-add-mode').setAttribute('aria-pressed','false');$('mobile-edit-mode').setAttribute('aria-pressed','false');
+  }
+}
+function openMobileWorkspace(){
+  mobileStartVisible=false;document.body.classList.remove('mobile-starting');$('mobile-start').hidden=true;
+}
 async function api(path,body){
   const response=await fetch(path,{cache:'no-store',credentials:'same-origin',redirect:'follow',signal:AbortSignal.timeout(45000),...(body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json','X-Atlas-CSRF':csrf},body:JSON.stringify(body)})});
   if(response.status===401||response.status===403||!/application\/(?:[\w.-]+\+)?json/i.test(response.headers.get('Content-Type')||'')){const key='claudia-access-reauth';const last=Number(sessionStorage.getItem(key)||0);if(Date.now()-last<30000){message('作者后台页面已登录，但搜索接口没有通过 Cloudflare Access。请在 Access 应用中保留目标 author/*，保存后重新打开本页。',true);throw new Error('搜索接口未通过 Cloudflare Access。');}sessionStorage.setItem(key,String(Date.now()));message('登录会话已过期，正在重新登录…',true);setTimeout(()=>{location.replace('/author/?reauth='+Date.now())},150);throw new Error('登录会话已过期，正在重新登录。');}
@@ -96,11 +126,12 @@ async function load(){
     ready=true;$('identity-label').textContent=session.author.email;
     const requested=new URL(location.href).searchParams.get('place');
     const id=[selected,requested,allPlaces()[0]?.id].find(id=>allPlaces().some(p=>p.id===id));
-    if(id)select(id);else createPlace();
+    if(id)select(id);else{createPlace();if(isMobileViewport())dirty=false;}
+    if(isMobileViewport())setMobileStart(true);
     message('已连接云端。可以新增猫咪、定位遇见位置，并保存草稿或发布。');
   }catch(e){message(e.message,true);}finally{lock(false);}
 }
-function createPlace(){select('place-'+crypto.randomUUID(),{place:'',title:'',region:'chongqing',breed:'',coordinates:null,photos:[],review:{author:'竹喵',rating:null,comment:''}});dirty=true;$('location-query').focus();message('先搜索或点选遇见位置，再填写猫咪名字和品种。');}
+function createPlace(){select('place-'+crypto.randomUUID(),{place:'',title:'',region:'chongqing',breed:'',coordinates:null,photos:[],review:{author:'竹喵',rating:null,comment:''}});dirty=true;if(!isMobileViewport())$('location-query').focus();message('先搜索或点选遇见位置，再填写猫咪名字和品种。');}
 async function save(action){
   if(busy||!ready)return;
   if(action!=='discard-draft'&&!point()){message('请先定位遇见位置，或在地图上点选位置。',true);$('location-query').focus();return;}
@@ -176,6 +207,24 @@ $('photos').addEventListener('change',async e=>{
   try{const groups=[];for(let i=0;i<files.length;i++){message(`正在读取照片 ${i+1}/${files.length}…`);const gps=await readPhotoGps(files[i]);const valid=gps&&gps[0]>=105.2&&gps[0]<=110.3&&gps[1]>=28.1&&gps[1]<=32.3;let group=valid&&groups.find(g=>g.gps&&distanceMeters(g.gps,gps)<=500);if(!group){group={gps:valid?gps:null,files:[]};groups.push(group);}group.files.push(files[i]);}renderPhotoSeries(groups);}catch(e){message(e.message,true);}
 });
 $('confirm-photo-series').onclick=uploadPhotoGroups;
+$('mobile-add-mode').onclick=()=>{
+  if(busy)return;
+  $('mobile-add-mode').setAttribute('aria-pressed','true');$('mobile-edit-mode').setAttribute('aria-pressed','false');$('mobile-edit-panel').hidden=true;
+  createPlace();openMobileWorkspace();message('开始添加猫咪：先上传照片或定位遇见位置，再填写猫咪名字和品种。');
+  $('photos-section').scrollIntoView({block:'start',behavior:'smooth'});
+};
+$('mobile-edit-mode').onclick=()=>{
+  if(busy)return;
+  $('mobile-edit-mode').setAttribute('aria-pressed','true');$('mobile-add-mode').setAttribute('aria-pressed','false');$('mobile-edit-panel').hidden=false;
+  renderMobileEditOptions();$('mobile-edit-select').focus();
+};
+$('mobile-edit-select').onchange=e=>{$('mobile-edit-continue').disabled=!e.target.value;};
+$('mobile-edit-continue').onclick=()=>{
+  const id=$('mobile-edit-select').value;if(!id)return;
+  if(!leaveOK())return;select(id);openMobileWorkspace();message('已打开猫咪记录，可以修改信息、照片或撸猫记录。');
+  $('details-section').scrollIntoView({block:'start',behavior:'smooth'});
+};
+$('mobile-change-mode').onclick=()=>{if(busy||!leaveOK())return;setMobileStart(true);window.scrollTo({top:0,behavior:'smooth'});};
 $('place-form').addEventListener('input',()=>{dirty=true;ratingUI();categoryUI();reviewCounts();drawPins();});
 for(const id of ['longitude','latitude'])$(id).addEventListener('input',()=>{current.locationPrecision='作者填写坐标';delete current.coordinateSource;});
 $('place-select').addEventListener('change',e=>{if(leaveOK())select(e.target.value);else e.target.value=selected;});

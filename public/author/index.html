@@ -1,12 +1,29 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>地图编辑室 · 竹喵的撸猫地图</title><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/assets/editor.v0.5.2.css"><script type="module" src="/assets/editor.v0.8.js?v=20261011-6"></script><link rel="stylesheet" href="/assets/place-style.v0.6.css"><link rel="stylesheet" href="/assets/reviews.v0.7.css"><link rel="stylesheet" href="/assets/details.v0.8.css"><link rel="stylesheet" href="/assets/claudia.css"><link rel="stylesheet" href="/assets/claudia-editor.css?v=20261011-3"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>地图编辑室 · 竹喵的撸猫地图</title><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/assets/editor.v0.5.2.css"><script type="module" src="/assets/editor.v0.8.js?v=20261011-7"></script><link rel="stylesheet" href="/assets/place-style.v0.6.css"><link rel="stylesheet" href="/assets/reviews.v0.7.css"><link rel="stylesheet" href="/assets/details.v0.8.css"><link rel="stylesheet" href="/assets/claudia.css"><link rel="stylesheet" href="/assets/claudia-editor.css?v=20261011-4"></head>
 <body class="author-desk">
 <header class="desk-header"><a class="desk-brand" href="/">z. 竹喵的撸猫地图 · 编辑室</a><nav><a href="/" target="_blank" rel="noopener">查看公开地图 ↗</a><a href="/cdn-cgi/access/logout">退出登录</a></nav></header>
 <main class="desk-shell">
 <div class="desk-heading"><div><span class="kicker">竹喵的撸猫地图 / 作者后台</span><h1>管理猫咪记录</h1><p></p></div><span id="identity-label">正在验证身份…</span></div>
 <p id="message" class="message" role="status" aria-live="polite">正在读取云端…</p>
+<section id="mobile-start" class="mobile-start" hidden aria-labelledby="mobile-start-heading">
+<div class="mobile-start-card">
+<span class="mobile-start-kicker">竹喵的撸猫地图 / 手机入口</span>
+<h2 id="mobile-start-heading">这次要做什么？</h2>
+<p class="mobile-start-intro">先选操作，后面的页面会按你的目的准备好。地点只是猫咪的遇见位置。</p>
+<div class="mobile-mode-grid" role="group" aria-label="选择作者操作">
+<button id="mobile-add-mode" class="mobile-mode-card" type="button"><span class="mobile-mode-icon">＋</span><strong>添加猫咪</strong><span>上传照片，读取地点，建立新的猫咪记录</span></button>
+<button id="mobile-edit-mode" class="mobile-mode-card" type="button"><span class="mobile-mode-icon">✎</span><strong>修改猫咪</strong><span>从已有记录中选择一只猫咪继续编辑</span></button>
+</div>
+<div id="mobile-edit-panel" class="mobile-edit-panel" hidden>
+<label for="mobile-edit-select">选择要修改的猫咪</label>
+<select id="mobile-edit-select" disabled></select>
+<button id="mobile-edit-continue" class="button primary" type="button" disabled>继续修改</button>
+</div>
+<p id="mobile-start-status" class="mobile-start-status" role="status" aria-live="polite"></p>
+</div>
+</section>
 <div class="place-toolbar"><label for="place-select">当前猫咪</label><select id="place-select" disabled></select><button id="new-place" class="button" disabled>＋ 新增猫咪</button><button id="reload" class="button" disabled>同步云端</button></div>
-<nav class="section-nav" aria-label="编辑区快捷导航"><a href="#details-section">01 猫咪信息</a><a href="#story-section">02 撸猫记录与评价</a><a href="#photos-section">03 照片相册</a></nav>
+<nav class="section-nav" aria-label="编辑区快捷导航"><a href="#details-section">01 猫咪信息</a><a href="#story-section">02 撸猫记录与评价</a><a href="#photos-section">03 照片相册</a><button id="mobile-change-mode" type="button">切换操作</button></nav>
 <div class="workspace">
 <aside class="map-column" id="location-panel"><section class="place-search-panel" aria-labelledby="search-heading">
 <div class="panel-heading"><h2 id="search-heading">定位遇见位置</h2><span>重庆地名库</span></div>

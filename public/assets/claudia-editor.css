@@ -39,9 +39,29 @@ body.author-desk{--white:#171e1a;background:#0c100f;color:var(--ink);padding-bot
 .author-desk .field-note,.author-desk .search-hint,.author-desk .search-disclosure{color:#b3c2b7}
 .author-desk a{color:#c1dfa9}
 .author-desk .quick-flow{display:flex;gap:8px;flex-wrap:wrap;margin:-8px 0 20px;padding:10px 12px;border:1px solid #35473b;border-radius:8px;background:#202c23;color:#c5d8c0;font-size:12px}.author-desk .quick-flow span{padding-right:8px}.author-desk .quick-flow span+span{border-left:1px solid #526456;padding-left:8px}
+.author-desk .mobile-start{display:none}
+.author-desk #mobile-change-mode{display:none}
 @media(max-width:1050px){.author-desk .workspace{grid-template-columns:minmax(0,1.25fr) minmax(300px,1fr);gap:18px}.author-desk .photo-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){
  body.author-desk{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+ .author-desk.mobile-starting .desk-heading,.author-desk.mobile-starting>.message,.author-desk.mobile-starting>.place-toolbar,.author-desk.mobile-starting>.section-nav,.author-desk.mobile-starting>.workspace{display:none}
+ .author-desk.mobile-starting .mobile-start{display:block;padding-top:6px}
+ .author-desk .mobile-start-card{padding:22px 18px 20px;border:1px solid #425446;border-radius:18px;background:linear-gradient(145deg,#1b2920,#131b16);box-shadow:0 18px 50px #0006}
+ .author-desk .mobile-start-kicker{display:block;color:#b6d997;font-size:11px;font-weight:750;letter-spacing:.1em;text-transform:uppercase}
+ .author-desk .mobile-start-card h2{margin:13px 0 8px;color:#edf2eb;font-size:28px;line-height:1.15;letter-spacing:-.04em}
+ .author-desk .mobile-start-intro{margin:0 0 20px;color:#b3c2b7;font-size:13px;line-height:1.65}
+ .author-desk .mobile-mode-grid{display:grid;gap:10px}
+ .author-desk .mobile-mode-card{display:grid;grid-template-columns:42px 1fr;grid-template-rows:auto auto;column-gap:12px;align-items:center;width:100%;padding:14px;border:1px solid #526456;border-radius:13px;background:#202c23;color:#edf2eb;text-align:left;transition:border-color .18s,background .18s,transform .18s}
+ .author-desk .mobile-mode-card:active{transform:scale(.985)}
+ .author-desk .mobile-mode-card[aria-pressed=true],.author-desk .mobile-mode-card:hover{border-color:#b6d997;background:#2a3d2d}
+ .author-desk .mobile-mode-icon{grid-row:1 / span 2;display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#b6d997;color:#152017;font-size:25px;line-height:1}
+ .author-desk .mobile-mode-card strong{font-size:15px;line-height:1.3}
+ .author-desk .mobile-mode-card>span:last-child{margin-top:3px;color:#b3c2b7;font-size:11px;line-height:1.45}
+ .author-desk .mobile-edit-panel{display:grid;gap:9px;margin-top:14px;padding:14px;border:1px solid #526456;border-radius:13px;background:#0e1511}
+ .author-desk .mobile-edit-panel label{color:#c5d8c0;font-size:12px;font-weight:650}
+ .author-desk .mobile-edit-panel select{margin:0;min-height:44px}
+ .author-desk .mobile-edit-panel .button{min-height:44px}
+ .author-desk .mobile-start-status{min-height:18px;margin:14px 2px 0;color:#b3c2b7;font-size:11px;line-height:1.5}
  .author-desk .desk-header{padding:14px 16px;min-height:58px}
  .author-desk .desk-header nav a:first-child{display:inline}
  .author-desk .desk-shell{padding:20px 12px}
@@ -65,5 +85,6 @@ body.author-desk{--white:#171e1a;background:#0c100f;color:var(--ink);padding-bot
  .author-desk .editor-actions>.button{min-width:0;flex:1;padding:10px 8px}
  .author-desk .picker{height:260px}
  .author-desk .quick-flow{display:grid;grid-template-columns:1fr;gap:5px;margin:-4px 0 16px;font-size:11px}.author-desk .quick-flow span+span{border-left:0;padding-left:0}
+ .author-desk #mobile-change-mode{display:inline-flex;align-items:center;margin-left:auto;padding:7px 9px;border:1px solid #526456;border-radius:7px;background:#202c23;color:#c1dfa9;font-size:11px}
 }
 @media(max-width:380px){.author-desk .photo-list{grid-template-columns:1fr}.author-desk .desk-brand{font-size:12px}.author-desk .section-nav a{padding:7px 8px}.author-desk .panel-heading{flex-wrap:wrap}}
