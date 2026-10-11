@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="./assets/collection.v0.9.css">
   <link rel="stylesheet" href="./assets/place-style.v0.6.css">
 <link rel="stylesheet" href="./assets/reviews.v0.7.css">
-<link rel="stylesheet" href="./assets/details.v0.8.css"><link rel="stylesheet" href="./assets/story-layout.v0.8.2.css"><link rel="stylesheet" href="./assets/guest-layout.v0.9.css"><link rel="stylesheet" href="./assets/guest-layout.v0.9.1.css"><link rel="stylesheet" href="./assets/collection.v0.9.2.css"><link rel="stylesheet" href="./assets/collection.v1.0.css"><link rel="stylesheet" href="./assets/collection.v1.1.css"><link rel="stylesheet" href="./assets/collection.v1.2.css"><link rel="stylesheet" href="./assets/collection.v1.2.1.css"><link rel="stylesheet" href="./assets/collection.v1.3.css"><link rel="stylesheet" href="./assets/claudia.css?v=20261011-4"></head>
+<link rel="stylesheet" href="./assets/details.v0.8.css"><link rel="stylesheet" href="./assets/story-layout.v0.8.2.css"><link rel="stylesheet" href="./assets/guest-layout.v0.9.css"><link rel="stylesheet" href="./assets/guest-layout.v0.9.1.css"><link rel="stylesheet" href="./assets/collection.v0.9.2.css"><link rel="stylesheet" href="./assets/collection.v1.0.css"><link rel="stylesheet" href="./assets/collection.v1.1.css"><link rel="stylesheet" href="./assets/collection.v1.2.css"><link rel="stylesheet" href="./assets/collection.v1.2.1.css"><link rel="stylesheet" href="./assets/collection.v1.3.css"><link rel="stylesheet" href="./assets/claudia.css?v=20261011-5"></head>
 <body>
   <svg class="icon-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
@@ -59,16 +59,16 @@
     </aside>
     <section class="map-frame" id="map-frame" aria-label="重庆互动地图">
       <div class="map-surface" id="map-surface">
-        <svg id="atlas-svg" class="atlas-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="重庆区县总览"><defs><clipPath id="chongqing-art-clip"></clipPath></defs><g id="geographic-layer"></g></svg>
+        <svg id="atlas-svg" class="atlas-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="重庆主城绘本地图"><defs><clipPath id="chongqing-art-clip"></clipPath></defs><g id="geographic-layer"></g></svg>
         <div class="online-map" id="online-map" aria-label="在线街道地图" hidden></div>
         <div class="labels-layer" id="labels-layer" aria-hidden="true"></div>
         <div class="marker-layer" id="marker-layer" aria-label="地图上的猫咪"></div>
       </div>
       <div class="map-grain" aria-hidden="true"></div>
-      <div class="map-caption"><span class="eyebrow">CHONGQING</span><span id="map-context">重庆全览 <i>／</i> 猫咪分布</span></div>
-      <div class="map-style-switch" aria-label="底图模式"><button id="overview-button" type="button" aria-pressed="true"><svg class="icon"><use href="#i-map"/></svg>区县总览</button><button id="street-button" type="button" aria-pressed="false"><svg class="icon"><use href="#i-grid"/></svg>街道底图</button></div>
+      <div class="map-caption"><span class="eyebrow">CHONGQING</span><span id="map-context">重庆主城 <i>／</i> 猫咪分布</span></div>
+      <div class="map-style-switch" aria-label="底图模式"><button id="overview-button" type="button" aria-pressed="true"><svg class="icon"><use href="#i-map"/></svg>主城地图</button><button id="street-button" type="button" aria-pressed="false"><svg class="icon"><use href="#i-grid"/></svg>街道底图</button></div>
       <div class="compass" aria-hidden="true"><span>N</span><svg viewBox="0 0 52 62"><path d="M26 7 36 49 26 41 16 49Z" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M26 7v34l10 8Z" fill="currentColor"/><path d="M8 33h36M26 0v4M26 53v9" stroke="currentColor" stroke-width=".7"/><circle cx="26" cy="33" r="19" fill="none" stroke="currentColor" stroke-width=".5"/></svg></div>
-      <div class="map-controls" aria-label="地图操作"><button id="zoom-in" type="button" aria-label="放大地图" title="放大地图">＋</button><button id="zoom-out" type="button" aria-label="缩小地图" title="缩小地图">−</button><span></span><button id="reset-map" type="button" aria-label="回到重庆全览" title="回到重庆全览"><svg class="icon"><use href="#i-reset"/></svg></button></div>
+      <div class="map-controls" aria-label="地图操作"><button id="zoom-in" type="button" aria-label="放大地图" title="放大地图">＋</button><button id="zoom-out" type="button" aria-label="缩小地图" title="缩小一级查看全重庆">−</button><span></span><button id="reset-map" type="button" aria-label="回到重庆主城" title="回到重庆主城"><svg class="icon"><use href="#i-reset"/></svg></button></div>
       <div id="map-dedication" hidden></div>
       <div class="map-key"><span class="key-dot"></span><span id="map-key-label">猫咪分布</span><i></i><span class="map-hint">拖动探索 · 滚轮缩放</span></div>
       <div class="scale-wrap" id="scale-wrap"><span id="scale-text">200 km</span><span class="scale-line" id="scale-line"></span></div>

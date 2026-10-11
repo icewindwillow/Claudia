@@ -12,6 +12,8 @@ html{color-scheme:dark}body{background:#0c100f;color:var(--ink);font-family:var(
 .map-frame:not(.is-online) .coast-land{fill:rgba(61,91,70,.16);stroke:#3f5e4b;stroke-width:1.15}
 .map-frame:not(.is-online) .coast-water{fill:rgba(128,171,164,.12);stroke:#587c76}
 .map-frame:not(.is-online) .coast-boundary{stroke:#6b7d68;stroke-dasharray:3 3;opacity:.75}
+.map-frame:not(.is-online) .coast-city-boundary{fill:none;stroke:#5e7863;stroke-width:1.05;vector-effect:non-scaling-stroke;opacity:.78}
+.map-frame:not(.is-online) .urban-map-art{opacity:.98}
 .map-frame:not(.is-online) .geo-label strong{color:#294b39!important;text-shadow:0 1px 3px #f4efdc}
 .map-frame:not(.is-online) .geo-label{color:#476653}
 .map-frame:not(.is-online) .map-caption .eyebrow,.map-frame:not(.is-online) .map-caption>span:last-child{color:#2f5744}

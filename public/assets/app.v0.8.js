@@ -10,14 +10,18 @@ const $=id=>document.getElementById(id);
 const svgNS='http://www.w3.org/2000/svg';
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const small=()=>matchMedia('(max-width: 760px)').matches;
-// A slightly tighter opening composition keeps Chongqing and the cat clusters
-// visually present without losing the atlas-style breathing room.
+// The urban view is the useful default for this cat map. One zoom step out
+// reveals the whole municipality, while every coordinate remains in the same
+// Web-Mercator-like projection.
+const CITY_BOUNDS=[106.20,29.08,107.04,30.18];
+const CITY_DISTRICTS=new Set(['渝中区','大渡口区','江北区','沙坪坝区','九龙坡区','南岸区','北碚区','渝北区','巴南区']);
 const DEFAULT_OVERVIEW_ZOOM=1.15;
 const state={real:[],demos:[],items:[],filtered:[],region:'all',query:'',selected:null,online:false,loadingStreet:false};
 const icon=name=>{const s=document.createElementNS(svgNS,'svg');s.setAttribute('class','icon');s.setAttribute('aria-hidden','true');const u=document.createElementNS(svgNS,'use');u.setAttribute('href',`#i-${name}`);s.append(u);return s;};
 const text=(tag,className,value)=>{const el=document.createElement(tag);if(className)el.className=className;if(value!=null)el.textContent=value;return el;};
 let toastTimer;
 function notify(message,ms=4300){clearTimeout(toastTimer);$('map-status').textContent=message;if(ms)toastTimer=setTimeout(()=>$('map-status').textContent='',ms);}
+function insideBounds([lng,lat],bounds){return Array.isArray(bounds)&&lng>=bounds[0]&&lng<=bounds[2]&&lat>=bounds[1]&&lat<=bounds[3];}
 async function readJson(path,key){
   const embedded=embeddedPayload();if(embedded)return embedded[key];
   const r=await fetch(path,{cache:'no-cache',signal:AbortSignal.timeout(12000)});
@@ -26,30 +30,39 @@ async function readJson(path,key){
 
 class OverviewMap{
   constructor(){
-    this.surface=$('map-surface');this.svg=$('atlas-svg');this.group=$('geographic-layer');this.clip=$('chongqing-art-clip');this.camera={s:1,x:0,y:0};this.base=1;this.width=0;this.height=0;this.points=new Map();this.animation=0;
+    this.surface=$('map-surface');this.svg=$('atlas-svg');this.group=$('geographic-layer');this.clip=$('chongqing-art-clip');this.camera={s:1,x:0,y:0};this.base=1;this.width=0;this.height=0;this.points=new Map();this.animation=0;this.level='city';this.geography=null;this.cityFeatures=[];
     this.surface.tabIndex=0;this.surface.setAttribute('role','region');this.surface.setAttribute('aria-label','互动地图。方向键移动，加减号缩放，Home 回到全览。');
     new ResizeObserver(()=>this.resize()).observe(this.surface);
     this.bind();
   }
   setGeography(data){
     if(data?.type!=='FeatureCollection'||!Array.isArray(data.features))throw new Error('总览地理数据格式不正确。');
-    const land=data.features.filter(f=>f.properties?.kind==='land');
+    this.geography=data;this.cityFeatures=data.features.filter(f=>f.properties?.kind==='land'&&CITY_DISTRICTS.has(f.properties?.name));
+    this.setLevel('city',false,false);
+  }
+  setLevel(level='city',animated=true,announce=true){
+    const next=level==='overview'?'overview':'city';
+    if(!this.geography)return;
+    this.level=next;
+    const features=next==='city'?this.cityFeatures:this.geography.features.filter(f=>f.properties?.kind==='land');
     const clipFrag=document.createDocumentFragment();
-    for(const f of land){const p=document.createElementNS(svgNS,'path');p.setAttribute('d',featurePath(f));clipFrag.append(p);}
+    for(const f of features){const p=document.createElementNS(svgNS,'path');p.setAttribute('d',featurePath(f));clipFrag.append(p);}
     this.clip.replaceChildren(clipFrag);
-    const [west,south,east,north]=MAP_BOUNDS;
+    const [west,south,east,north]=next==='city'?CITY_BOUNDS:MAP_BOUNDS;
     const top=project([west,north])[1],bottom=project([west,south])[1];
-    const art=document.createElementNS(svgNS,'image');art.classList.add('map-art');art.setAttribute('href','./assets/maps/chongqing-handdrawn-map-v4.webp');art.setAttribute('x',String(west));art.setAttribute('y',String(top));art.setAttribute('width',String(east-west));art.setAttribute('height',String(bottom-top));art.setAttribute('preserveAspectRatio','none');art.setAttribute('clip-path','url(#chongqing-art-clip)');
+    const art=document.createElementNS(svgNS,'image');art.classList.add('map-art',next==='city'?'urban-map-art':'regional-map-art');art.setAttribute('href',next==='city'?'./assets/maps/chongqing-urban-picturebook-v1.svg':'./assets/maps/chongqing-handdrawn-map-v4.webp');art.setAttribute('x',String(west));art.setAttribute('y',String(top));art.setAttribute('width',String(east-west));art.setAttribute('height',String(bottom-top));art.setAttribute('preserveAspectRatio','none');art.setAttribute('clip-path','url(#chongqing-art-clip)');
     const frag=document.createDocumentFragment();
     frag.append(art);
-    for(const f of data.features){const p=document.createElementNS(svgNS,'path');p.setAttribute('d',featurePath(f));p.setAttribute('class',`coast-${f.properties.kind}`);frag.append(p);}
-    this.group.replaceChildren(frag);this.reset(false);
+    for(const f of features){const p=document.createElementNS(svgNS,'path');p.setAttribute('d',featurePath(f));p.setAttribute('class',next==='city'?'coast-city-boundary':`coast-${f.properties.kind}`);frag.append(p);}
+    this.group.replaceChildren(frag);this.reset(animated);
+    const context=$('map-context');if(context)context.textContent=next==='city'?'重庆主城 ／ 猫咪分布':'重庆全域 ／ 区县总览';
+    if(announce)notify(next==='city'?'重庆主城 · 猫咪分布':'重庆全域 · 区县总览',2200);
   }
   resize(){
     const w=this.surface.clientWidth,h=this.surface.clientHeight;if(!w||!h||w===this.width&&h===this.height)return;
     const previous=this.width?this.toGeo([this.width/2,this.height/2]):null;
     const relative=this.camera.s/this.base;this.width=w;this.height=h;
-    const full=this.defaultCamera();this.base=full.s/DEFAULT_OVERVIEW_ZOOM;
+    const full=this.defaultCamera();this.base=full.s/(this.level==='city'?.90:DEFAULT_OVERVIEW_ZOOM);
     if(previous&&relative>1.12){const p=project(previous);this.camera={s:full.s*relative,x:w/2-p[0]*full.s*relative,y:h/2-p[1]*full.s*relative};}
     else this.camera=full;
     this.render();if(streetMap)streetMap.resize();
@@ -61,7 +74,8 @@ class OverviewMap{
     return {s,x:left+(this.width-left-right)/2-(a[0]+b[0])*s/2,y:top+(this.height-top-bottom)/2-(a[1]+b[1])*s/2};
   }
   defaultCamera(){
-    const full=this.cameraFor(MAP_BOUNDS,false),zoom=DEFAULT_OVERVIEW_ZOOM;
+    const bounds=this.level==='city'?CITY_BOUNDS:MAP_BOUNDS;
+    const full=this.cameraFor(bounds,false),zoom=this.level==='city'?.90:DEFAULT_OVERVIEW_ZOOM;
     const left=small()?29:68,right=small()?29:78,top=small()?90:88,bottom=small()?62:67;
     const cx=left+(this.width-left-right)/2,cy=top+(this.height-top-bottom)/2;
     return {s:full.s*zoom,x:cx-(cx-full.x)*zoom,y:cy-(cy-full.y)*zoom};
@@ -76,14 +90,16 @@ class OverviewMap{
     const step=now=>{const t=Math.min(1,(now-started)/650),k=1-(1-t)**3;this.camera={s:from.s+(target.s-from.s)*k,x:from.x+(target.x-from.x)*k,y:from.y+(target.y-from.y)*k};this.render();if(t<1)this.animation=requestAnimationFrame(step);};
     this.animation=requestAnimationFrame(step);
   }
-  reset(animated=true){const c=this.defaultCamera();this.base=c.s/DEFAULT_OVERVIEW_ZOOM;this.animate(c,animated);}
+  reset(animated=true){const c=this.defaultCamera();this.base=c.s/(this.level==='city'?.90:DEFAULT_OVERVIEW_ZOOM);this.animate(c,animated);}
   focus(coords,multiplier=2.5){
+    if(this.level==='city'&&!insideBounds(coords,CITY_BOUNDS)){this.setLevel('overview',true);}
     const p=project(coords);const s=Math.max(this.base,Math.min(this.base*18,this.base*multiplier));
     const reserve=0;
     this.animate({s,x:(this.width-reserve)/2-p[0]*s,y:this.height*.48-p[1]*s});
   }
   fit(items){
     const coords=items.filter(m=>m.coordinates).map(m=>m.coordinates);if(!coords.length)return;
+    if(this.level==='city'&&coords.some(c=>!insideBounds(c,CITY_BOUNDS))){this.setLevel('overview',true);}
     if(coords.length===1){this.focus(coords[0],3);return;}
     const bounds=clusterBounds(items);
     const c=this.cameraFor(bounds);const s=Math.max(this.base,Math.min(c.s,this.base*OVERVIEW_MAX_ZOOM));const a=project([bounds[0],bounds[3]]),b=project([bounds[2],bounds[1]]);c.x+=(a[0]+b[0])/2*(c.s-s);c.y+=(a[1]+b[1])/2*(c.s-s);c.s=s;
@@ -91,6 +107,8 @@ class OverviewMap{
   }
   zoom(factor,point=[this.width/2,this.height/2]){
     cancelAnimationFrame(this.animation);const c=this.camera;
+    if(factor<1&&this.level==='city'){this.setLevel('overview',true);return;}
+    if(factor>1&&this.level==='overview'){this.setLevel('city',true);return;}
     const s=Math.max(this.base*.82,Math.min(this.base*OVERVIEW_MAX_ZOOM,c.s*factor));
     if(s===c.s&&factor>1)notify('总览已经放大到上限。具体道路请切换「街道底图」。');
     const r=s/c.s;this.camera={s,x:point[0]-(point[0]-c.x)*r,y:point[1]-(point[1]-c.y)*r};this.render();
@@ -100,10 +118,10 @@ class OverviewMap{
     // Keep the viewport anchored to Chongqing. The old implementation still
     // clamped the camera to the former UK extent, so a small drag on mobile
     // sent the Chongqing map to a blank area around Europe.
-    const c=this.camera,p=this.toGeo([this.width/2,this.height/2]);
+    const c=this.camera,p=this.toGeo([this.width/2,this.height/2]),bounds=this.level==='city'?CITY_BOUNDS:MAP_BOUNDS;
     const q=project([
-      Math.max(MAP_BOUNDS[0],Math.min(MAP_BOUNDS[2],p[0])),
-      Math.max(MAP_BOUNDS[1],Math.min(MAP_BOUNDS[3],p[1]))
+      Math.max(bounds[0],Math.min(bounds[2],p[0])),
+      Math.max(bounds[1],Math.min(bounds[3],p[1]))
     ]);
     c.x=this.width/2-q[0]*c.s;
     c.y=this.height/2-q[1]*c.s;
@@ -146,7 +164,7 @@ function renderOverlays(){
   // is recognisable as a cat at the first map level. Clusters still use their
   // count badge when several cats share the same nearby area.
   const breedZoom=true;
-  const labelBoxes=[];labelData.forEach((d,i)=>{const el=labelEls[i],p=atlas.screen(d.point);const width=Math.min(120,d.zh.length*12),box={x:p[0]-width/2,y:p[1]-9,w:width,h:18};const overlap=labelBoxes.some(b=>box.x<b.x+b.w+6&&box.x+box.w+6>b.x&&box.y<b.y+b.h+4&&box.y+box.h+4>b.y);el.style.left=`${p[0]}px`;el.style.top=`${p[1]}px`;el.hidden=state.online||p[0]<0||p[0]>w||p[1]<10||p[1]>h-25||zoomRatio>10||overlap;if(!el.hidden)labelBoxes.push(box);el.style.opacity='1';});
+  const labelBoxes=[];labelData.forEach((d,i)=>{const el=labelEls[i],p=atlas.screen(d.point);const width=Math.min(120,d.zh.length*12),box={x:p[0]-width/2,y:p[1]-9,w:width,h:18};const overlap=labelBoxes.some(b=>box.x<b.x+b.w+6&&box.x+box.w+6>b.x&&box.y<b.y+b.h+4&&box.y+box.h+4>b.y);el.style.left=`${p[0]}px`;el.style.top=`${p[1]}px`;el.hidden=state.online||(atlas.level==='city'&&!CITY_DISTRICTS.has(d.zh))||p[0]<0||p[0]>w||p[1]<10||p[1]>h-25||zoomRatio>10||overlap;if(!el.hidden)labelBoxes.push(box);el.style.opacity='1';});
   const groups=clusterPoints(state.filtered,screenPoint,small()?29:31);
   const allPins=groups.map(g=>{const size=g.items.length>3?88:g.items.length>1?70:28;return {x:g.x-size/2,y:g.y-size/2,w:size,h:size};});
   const placed=[];const keep=new Set();
@@ -194,7 +212,7 @@ function expandCluster(items){
 }
 const clusterDialog=document.createElement('dialog');clusterDialog.className='cluster-dialog';clusterDialog.setAttribute('aria-label','选择聚合猫咪');document.body.append(clusterDialog);
 function showCluster(items){clusterDialog.replaceChildren();const heading=text('h2','',`${items.length} 只相邻或同址猫咪`),note=text('p','','这些猫咪保留各自的遇见位置。请选择要查看的记录。'),close=text('button','cluster-close','关闭');close.type='button';close.onclick=()=>clusterDialog.close();clusterDialog.append(heading,note,close);for(const m of items){const button=text('button','cluster-choice');button.type='button';button.append(categoryIcon(m.category),text('span','',m.place),text('small','',m.placeEn||''));button.onclick=()=>{clusterDialog.close();openStory(m);};clusterDialog.append(button);}clusterDialog.showModal();}
-function resetView(){closeStory(false);$('map-context').replaceChildren(document.createTextNode('重庆全览 ／ 猫咪分布'));if(state.online)streetMap.fitBounds([[MAP_BOUNDS[0],MAP_BOUNDS[1]],[MAP_BOUNDS[2],MAP_BOUNDS[3]]],{padding:{top:90,bottom:65,left:40,right:50},duration:reduced?0:700});else atlas.reset();}
+function resetView(){closeStory(false);$('map-context').replaceChildren(document.createTextNode('重庆主城 ／ 猫咪分布'));if(state.online)streetMap.fitBounds([[CITY_BOUNDS[0],CITY_BOUNDS[1]],[CITY_BOUNDS[2],CITY_BOUNDS[3]]],{padding:{top:90,bottom:65,left:40,right:50},duration:reduced?0:700});else atlas.setLevel('city',true);}
 function refreshCollection(){
   state.items=[...state.real];
   const citySelection=$('city-filter').value;const cities=[...new Set(state.items.map(m=>m.city).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh-CN'));$('city-filter').replaceChildren(new Option('全部城市','all'),...cities.map(c=>new Option(c,c)),new Option('城市待确认','pending'));$('city-filter').value=cities.includes(citySelection)||citySelection==='pending'?citySelection:'all';
