@@ -19,7 +19,10 @@ html{color-scheme:dark}body{background:#0c100f;color:var(--ink);font-family:var(
 .map-frame:not(.is-online) .geo-label strong{color:#fff!important;text-shadow:0 1px 4px #102316,0 0 2px #102316}
 .map-frame:not(.is-online) .geo-label{color:#fff}
 .map-frame:not(.is-online) .map-caption .eyebrow,.map-frame:not(.is-online) .map-caption>span:last-child{color:#fff;text-shadow:0 1px 3px #102316}
-.map-frame.is-online .amap-street-map{background:#e4e1d7;filter:none}
+.map-frame.is-online .amap-street-map{background:#173429;filter:none}
+.map-frame.is-online .amap-layers{position:absolute;inset:0;overflow:hidden}
+.map-frame.is-online .amap-layer{filter:brightness(.68) contrast(1.08) saturate(.72) sepia(.28) hue-rotate(72deg)}
+.map-frame.is-online .amap-layers::after{content:'';position:absolute;inset:0;pointer-events:none;background:rgba(18,57,38,.34);mix-blend-mode:multiply}
 .map-frame.is-online .amap-container{font-family:var(--sans);}
 .map-frame.is-online .street-attribution{background:#19221ce8;color:#d9e6d3;}
 .map-frame.is-online .street-attribution a{color:#d9e6d3;}
@@ -32,3 +35,63 @@ html{color-scheme:dark}body{background:#0c100f;color:var(--ink);font-family:var(
 /* Transparent cat heads: the PNG silhouette remains visible without a white badge. */
 .map-marker:not(.cluster) .pin-dot.breed-pin{width:38px;height:38px;padding:0;background:transparent;border:0;border-radius:0;display:grid;place-items:center;overflow:visible;box-shadow:none;filter:drop-shadow(0 0 2.4px #fffdf2) drop-shadow(0 0 1px #fffdf2) drop-shadow(0 2px 2px #07100b99)}.pin-dot.breed-pin .breed-icon{width:38px;height:38px;flex-basis:38px;transform:translate(-2px,-1px)}.map-marker:hover .pin-dot.breed-pin,.map-marker:focus-visible .pin-dot.breed-pin{transform:scale(1.15)}
 .map-marker.multi-cat .pin-hit{left:-45px;top:-24px;width:90px;height:48px}.pin-dot.multi-cat-pin{width:auto;min-width:0;height:38px;padding:0;background:transparent;border:0;border-radius:0;display:flex;align-items:center;justify-content:center;overflow:visible;gap:0;filter:drop-shadow(0 0 2.4px #fffdf2) drop-shadow(0 0 1px #fffdf2) drop-shadow(0 2px 2px #07100b99)}.cat-avatar{width:31px;height:31px;flex:0 0 31px;margin-left:-8px;border:0;border-radius:0;background:transparent;display:grid;place-items:center;overflow:visible;filter:drop-shadow(0 0 2.2px #fffdf2) drop-shadow(0 0 1px #fffdf2) drop-shadow(0 1px 1px #07100b99)}.cat-avatar:first-child{margin-left:0}.cat-avatar .breed-icon{width:35px;height:35px;flex-basis:35px;transform:translate(-2px,-1px)}.cat-avatar .category-icon{width:19px;height:19px;color:#c5e5a7}.cat-more{height:24px;min-width:24px;margin-left:4px;padding:0 4px;border-radius:12px;background:#203326e8;color:#f4f3df;border:1px solid #b6d99799;display:grid;place-items:center;font:600 10px/1 var(--sans);white-space:nowrap}.map-marker:hover .pin-dot.multi-cat-pin,.map-marker:focus-visible .pin-dot.multi-cat-pin{transform:scale(1.08)}
+/* Paper texture, a double hand-drawn frame, and a warmer scale legend keep the
+   live map feeling like part of the cat journal without touching its controls. */
+.map-surface{z-index:1}
+.map-surface::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.09;mix-blend-mode:soft-light;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='.72'/%3E%3C/svg%3E");}
+.map-frame::before{content:'';position:absolute;inset:9px;z-index:4;pointer-events:none;border:1px solid #afc9a077;border-radius:12px;box-shadow:inset 0 0 0 2px #5b7d6550,0 0 0 1px #d4e1c52b;transform:rotate(.12deg);}
+.map-caption{padding:12px 15px 13px 14px;background:linear-gradient(120deg,#17261edf,#17261e99 75%,transparent);border-left:2px solid #b6d997cc;border-radius:2px 10px 10px 2px;box-shadow:0 5px 16px #08130c24;}
+.map-caption::before{content:'✦';position:absolute;left:-8px;top:-9px;color:#f0c27e;font-size:14px;text-shadow:0 1px 4px #0c1a10;}
+.map-caption .eyebrow{display:flex;align-items:center;gap:7px;letter-spacing:2.7px;}
+.map-caption .eyebrow::after{content:'';display:block;width:26px;height:1px;background:#b6d997a8;box-shadow:7px 3px 0 #b6d9974a;}
+.map-caption>span:last-child{padding-top:8px;border-top:1px solid #b6d99745;letter-spacing:.7px;}
+.scale-wrap{right:20px;bottom:38px;gap:5px;padding:7px 9px 8px;background:#15231ddd;border:1px solid #b6d99770;border-radius:7px;box-shadow:0 5px 18px #07110bcc;color:#deedcf;font:10px/1 var(--sans);letter-spacing:.3px;}
+.scale-line{height:8px;border:1px solid #d7e8c9;border-top:0;border-radius:0 0 2px 2px;background:linear-gradient(to right,#d7e8c9 0 50%,transparent 50% 100%);background-size:14px 4px;background-repeat:repeat-x;background-position:left bottom;}
+.scale-line::before{content:'';display:block;width:100%;height:2px;margin-top:-1px;background:#d7e8c9;}
+
+/* Night mode keeps the map legible while giving transparent cat stickers a
+   warm lantern-like halo. */
+.map-frame.is-night .map-surface{background:#0d2119;}
+.map-frame.is-night .map-surface::after{opacity:.14;mix-blend-mode:screen;}
+.map-frame.is-night .atlas-svg{filter:brightness(.62) saturate(.82) sepia(.12) hue-rotate(74deg);}
+.map-frame.is-night .map-dim{background:rgba(5,18,13,.38);}
+.map-frame.is-night .amap-layer{filter:brightness(.48) contrast(1.12) saturate(.8) sepia(.32) hue-rotate(72deg);}
+.map-frame.is-night .amap-layers::after{background:rgba(7,31,21,.42);}
+.map-frame.is-night .map-caption{background:linear-gradient(120deg,#091a13ed,#0b1d1599 75%,transparent);}
+.map-frame.is-night .map-caption .eyebrow,.map-frame.is-night .map-caption>span:last-child{color:#f0e2c2;}
+.map-frame.is-night .map-caption .eyebrow::after{background:#f0c27eaa;box-shadow:7px 3px 0 #f0c27e55;}
+.map-frame.is-night .scale-wrap{background:#08150fee;border-color:#f0c27e99;color:#ffe3b5;}
+.map-frame.is-night .scale-line,.map-frame.is-night .scale-line::before{border-color:#ffe3b5;background-color:#ffe3b5;}
+.map-frame.is-night .map-marker .pin-dot{box-shadow:0 0 0 4px #f0c27e4a,0 0 13px #e89a54cc,0 2px 5px #000b;}
+.map-frame.is-night .map-marker:not(.cluster) .pin-dot.breed-pin,.map-frame.is-night .pin-dot.multi-cat-pin{filter:drop-shadow(0 0 3px #ffe0a9) drop-shadow(0 0 10px #e89a54cc) drop-shadow(0 2px 3px #000b);}
+.map-frame.is-night .cat-avatar{filter:drop-shadow(0 0 3px #ffe0a9) drop-shadow(0 0 7px #e89a54aa);}
+
+/* Same-place groups open into compact, selectable cards beside the marker. */
+.cluster-popover{position:absolute;left:50%;top:29px;z-index:12;display:grid;gap:5px;width:218px;padding:7px;background:#17271eF0;border:1px solid #b6d9979c;border-radius:10px;box-shadow:0 12px 28px #06100bd9;transform:translateX(-50%);pointer-events:auto;}
+.cluster-popover[hidden]{display:none;}
+.cluster-card{display:flex;align-items:center;gap:8px;width:100%;min-height:42px;padding:5px 7px;background:#22372ae8;border:1px solid #52735699;border-radius:7px;text-align:left;color:#ecf5e6;cursor:pointer;}
+.cluster-card:hover,.cluster-card:focus-visible{background:#315139;border-color:#c2e19f;outline:0;}
+.cluster-card-avatar{width:31px;height:31px;flex:0 0 31px;display:grid;place-items:center;overflow:visible;}
+.cluster-card-avatar .breed-icon{width:31px;height:31px;flex-basis:31px;}
+.cluster-card-info{min-width:0;display:grid;gap:2px;}
+.cluster-card-info strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 12px/1.3 var(--sans);}
+.cluster-card-info small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#bad0b2;font:10px/1.3 var(--sans);}
+.cluster-card-more{padding:5px 6px;color:#f0c27e;font:11px/1.3 var(--sans);text-align:center;border-top:1px solid #b6d99745;cursor:pointer;}
+.cluster-card-more:hover,.cluster-card-more:focus-visible{color:#ffe4b0;outline:0;}
+.map-marker.cluster-expanded{z-index:15;}
+.map-marker.cluster-expanded .pin-label{border-color:#f0c27e;color:#f9e5be;background:#213729;}
+.cluster-dialog{width:min(360px,calc(100vw - 32px));padding:20px;background:#17271e;color:#eaf2e3;border:1px solid #b6d9979c;border-radius:12px;box-shadow:0 30px 80px #000b;}
+.cluster-dialog h2{margin:0 0 5px;font:600 19px/1.4 var(--sans);color:#f0f5e9;}
+.cluster-dialog>p{margin:0 0 14px;color:#b8ccb4;font-size:11px;line-height:1.7;}
+.cluster-choice{display:flex;align-items:center;gap:8px;width:100%;padding:10px 8px;margin:5px 0;background:#22372a;border:1px solid #52735699;border-radius:7px;color:#edf5e7;text-align:left;}
+.cluster-choice:hover{background:#315139;border-color:#c2e19f;}
+.cluster-choice small{margin-left:auto;color:#bad0b2;}
+.cluster-close{margin-top:12px;padding:7px 10px;border:1px solid #5f7b60;border-radius:6px;color:#cde4c2;font-size:11px;}
+
+@media(max-width:760px){
+  .map-style-switch{max-width:calc(100% - 22px);overflow:auto;}
+  .map-style-switch button{white-space:nowrap;}
+  .map-style-switch #night-button span:last-child{display:none;}
+  .map-style-switch #night-button{min-width:36px;justify-content:center;}
+  .cluster-popover{width:min(218px,calc(100vw - 54px));}
+}

@@ -22,7 +22,7 @@ const CITY_TO_OVERVIEW_THRESHOLD=.58;
 const OVERVIEW_TO_CITY_THRESHOLD=1.9;
 const LEVEL_SWITCH_COOLDOWN=900;
 const MIN_CITY_ZOOM=.42;
-const state={real:[],demos:[],items:[],filtered:[],region:'all',query:'',selected:null,online:false,loadingStreet:false};
+const state={real:[],demos:[],items:[],filtered:[],region:'all',query:'',selected:null,online:false,loadingStreet:false,night:false};
 const icon=name=>{const s=document.createElementNS(svgNS,'svg');s.setAttribute('class','icon');s.setAttribute('aria-hidden','true');const u=document.createElementNS(svgNS,'use');u.setAttribute('href',`#i-${name}`);s.append(u);return s;};
 const text=(tag,className,value)=>{const el=document.createElement(tag);if(className)el.className=className;if(value!=null)el.textContent=value;return el;};
 let toastTimer;
@@ -166,6 +166,7 @@ class OverviewMap{
 const labelData=[{"point": [108.402235, 30.706367], "zh": "万州区", "en": "", "kind": "region"}, {"point": [107.329521, 29.661157], "zh": "涪陵区", "en": "", "kind": "region"}, {"point": [106.536639, 29.552124], "zh": "渝中区", "en": "", "kind": "region"}, {"point": [106.454674, 29.420225], "zh": "大渡口区", "en": "", "kind": "region"}, {"point": [106.703119, 29.616013], "zh": "江北区", "en": "", "kind": "region"}, {"point": [106.36427, 29.626999], "zh": "沙坪坝区", "en": "", "kind": "region"}, {"point": [106.360442, 29.43112], "zh": "九龙坡区", "en": "", "kind": "region"}, {"point": [106.65682, 29.538362], "zh": "南岸区", "en": "", "kind": "region"}, {"point": [106.510159, 29.863692], "zh": "北碚区", "en": "", "kind": "region"}, {"point": [106.718792, 28.88182], "zh": "綦江区", "en": "", "kind": "region"}, {"point": [105.739079, 29.652698], "zh": "大足区", "en": "", "kind": "region"}, {"point": [106.742921, 29.812866], "zh": "渝北区", "en": "", "kind": "region"}, {"point": [106.747747, 29.374647], "zh": "巴南区", "en": "", "kind": "region"}, {"point": [108.704294, 29.438304], "zh": "黔江区", "en": "", "kind": "region"}, {"point": [107.135534, 29.957136], "zh": "长寿区", "en": "", "kind": "region"}, {"point": [106.259476, 29.032656], "zh": "江津区", "en": "", "kind": "region"}, {"point": [106.307663, 30.115074], "zh": "合川区", "en": "", "kind": "region"}, {"point": [105.869379, 29.293206], "zh": "永川区", "en": "", "kind": "region"}, {"point": [107.167047, 29.13832], "zh": "南川区", "en": "", "kind": "region"}, {"point": [106.188127, 29.564023], "zh": "璧山区", "en": "", "kind": "region"}, {"point": [106.02937, 29.813671], "zh": "铜梁区", "en": "", "kind": "region"}, {"point": [105.811005, 30.146076], "zh": "潼南区", "en": "", "kind": "region"}, {"point": [105.503236, 29.467592], "zh": "荣昌区", "en": "", "kind": "region"}, {"point": [108.378047, 31.273036], "zh": "开州区", "en": "", "kind": "region"}, {"point": [107.714739, 30.660896], "zh": "梁平区", "en": "", "kind": "region"}, {"point": [107.705234, 29.375976], "zh": "武隆区", "en": "", "kind": "region"}, {"point": [108.730584, 31.884007], "zh": "城口县", "en": "", "kind": "region"}, {"point": [107.826542, 29.88748], "zh": "丰都县", "en": "", "kind": "region"}, {"point": [107.433154, 30.25578], "zh": "垫江县", "en": "", "kind": "region"}, {"point": [107.910542, 30.338525], "zh": "忠县", "en": "", "kind": "region"}, {"point": [108.852543, 31.038795], "zh": "云阳县", "en": "", "kind": "region"}, {"point": [109.344665, 30.954517], "zh": "奉节县", "en": "", "kind": "region"}, {"point": [109.896516, 31.117622], "zh": "巫山县", "en": "", "kind": "region"}, {"point": [109.348351, 31.505093], "zh": "巫溪县", "en": "", "kind": "region"}, {"point": [108.294118, 30.096269], "zh": "石柱土家族自治县", "en": "", "kind": "region"}, {"point": [109.013623, 28.495039], "zh": "秀山土家族苗族自治县", "en": "", "kind": "region"}, {"point": [108.796012, 28.903026], "zh": "酉阳土家族苗族自治县", "en": "", "kind": "region"}, {"point": [108.262014, 29.35674], "zh": "彭水苗族土家族自治县", "en": "", "kind": "region"}];
 const labelEls=labelData.map(d=>{const el=text('div',`geo-label ${d.kind}`);el.append(text(d.kind==='region'?'strong':'span','',d.zh));if(d.en){if(d.kind!=='region')el.append(document.createElement('br'));el.append(text('small','',d.en));}$('labels-layer').append(el);return el;});
 const markerEls=new Map();
+let expandedClusterKey=null;
 let atlas;
 function screenPoint(coords){if(state.online&&streetMap){const p=streetMap.project(coords);return [p.x,p.y];}return atlas.screen(coords);}
 function renderOverlays(){
@@ -187,7 +188,7 @@ function renderOverlays(){
     if(!el){
       el=text('button','map-marker');el.type='button';el.dataset.markerId=key;
       const hit=text('span','pin-hit');hit.append(text('span','pin-dot'));el.append(hit,text('span','pin-label'));
-      el.addEventListener('click',()=>{const items=el._items;if(items.length===1)openStory(items[0],el);else expandCluster(items);});
+      el.addEventListener('click',()=>{const items=el._items;if(items.length===1)openStory(items[0],el);else {expandedClusterKey=expandedClusterKey===key?null:key;renderOverlays();}});
       $('marker-layer').append(el);markerEls.set(key,el);
     }
     el._items=g.items;el.style.left=`${g.x}px`;el.style.top=`${g.y}px`;el.classList.toggle('cluster',ids.length>1);el.classList.toggle('multi-cat',ids.length>1);el.classList.toggle('cluster-many',ids.length>3);el.classList.toggle('is-selected',ids.includes(state.selected?.id));
@@ -197,7 +198,20 @@ function renderOverlays(){
       dot.classList.add('multi-cat-pin');
       g.items.slice(0,3).forEach(m=>{const avatar=text('span','cat-avatar');const breed=breedZoom&&breedIcon(m.breed);avatar.append(breed||categoryIcon(m.category));avatar.title=m.breed||'品种未知';dot.append(avatar);});
       if(ids.length>3)dot.append(text('span','cat-more',`+${ids.length-3}`));
+      let popover=el.querySelector('.cluster-popover');
+      if(!popover){popover=text('div','cluster-popover');popover.setAttribute('role','group');popover.setAttribute('aria-label','同地点猫咪卡片');el.append(popover);}
+      popover.replaceChildren();
+      g.items.slice(0,3).forEach(m=>{
+        const card=text('div','cluster-card');card.setAttribute('role','button');card.tabIndex=0;
+        const avatar=text('span','cluster-card-avatar');avatar.append((breedZoom&&breedIcon(m.breed))||categoryIcon(m.category));
+        const info=text('span','cluster-card-info');info.append(text('strong','',m.place||m.title||'猫咪名字待补'),text('small','',[m.breed||'品种未知',m.lifeStatus&&m.lifeStatus!=='在世'?m.lifeStatus:''].filter(Boolean).join(' · ')));
+        card.append(avatar,info);const open=event=>{event.stopPropagation();expandedClusterKey=null;openStory(m,el);};card.addEventListener('click',open);card.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();open(event);}});popover.append(card);
+      });
+      if(ids.length>3){const more=text('div','cluster-card-more',`还有 ${ids.length-3} 只猫咪`);more.setAttribute('role','button');more.tabIndex=0;const openMore=event=>{event.stopPropagation();expandedClusterKey=null;showCluster(g.items);};more.addEventListener('click',openMore);more.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openMore(event);}});popover.append(more);}
+      popover.hidden=expandedClusterKey!==key;
+      el.classList.toggle('cluster-expanded',expandedClusterKey===key);
     }else{const breed=breedZoom&&breedIcon(g.items[0].breed);if(breed){dot.classList.add('breed-pin');dot.append(breed);}else dot.append(categoryIcon(g.items[0].category));el.setAttribute('aria-label',`${g.items[0].place}，${g.items[0].breed||'品种未知'}，${categoryOf(g.items[0].category)}，${g.items[0].review?.rating==null?'尚未评分':g.items[0].review.rating+' 星'}，查看猫咪记录`);}
+    if(ids.length===1)el.querySelector('.cluster-popover')?.remove();
     const label=el.querySelector('.pin-label');label.replaceChildren(text('span','',ids.length>1?`${ids.length} 只猫咪`:(g.items[0].place||g.items[0].title)));
     if(ids.length===1&&g.items[0].placeEn)label.append(text('small','',g.items[0].placeEn));
     const labelW=label.offsetWidth||100,labelH=label.offsetHeight||28;
@@ -251,6 +265,7 @@ function refreshCollection(){
 }
 let lastFocus=null;
 function openStory(m,trigger=null){
+  expandedClusterKey=null;
   state.selected=m;
   $('story-city').textContent=m.city||'所属城市待确认';
   const officialText=String(m.officialIntroduction||'').trim();
@@ -287,6 +302,7 @@ function closeStory(restore=true){
   if(!$('story-panel').open)return;closeViewer();$('story-panel').close();document.documentElement.classList.remove('has-story');state.selected=null;
   try{history.replaceState(null,'',location.pathname+location.search);}catch{}
   document.querySelectorAll('.memory-row').forEach(row=>row.setAttribute('aria-pressed','false'));
+  expandedClusterKey=null;
   if(restore&&lastFocus?.isConnected)lastFocus.focus({preventScroll:true});
   if(state.online&&streetMap)streetMap.setPadding({top:0,bottom:0,left:0,right:0});renderOverlays();
 }
@@ -364,6 +380,15 @@ for(const category of CATEGORIES){const span=text('span','');span.append(categor
 $('rating-sort').addEventListener('change',()=>{refreshCollection();try{localStorage.setItem('atlas-sort',$('rating-sort').value);}catch{}});
 document.querySelectorAll('#sort-buttons [data-sort]').forEach(button=>button.addEventListener('click',()=>{$('rating-sort').value=button.dataset.sort;refreshCollection();try{localStorage.setItem('atlas-sort',button.dataset.sort);}catch{}}));
 try{const saved=localStorage.getItem('atlas-sort');if(['default','rating-desc','rating-asc'].includes(saved))$('rating-sort').value=saved;}catch{}
+function setNightMode(enabled,announce=true){
+  state.night=Boolean(enabled);$('map-frame').classList.toggle('is-night',state.night);
+  $('night-button').setAttribute('aria-pressed',String(state.night));$('night-button').setAttribute('aria-label',state.night?'切换到日间模式':'切换到夜景模式');$('night-button').title=state.night?'切换到日间模式':'切换到夜景模式';
+  try{localStorage.setItem('atlas-night',state.night?'1':'0');}catch{}
+  if(announce)notify(state.night?'夜景模式 · 猫咪暖光已开启。':'日间模式 · 已恢复清晰底图。',2200);
+  renderOverlays();
+}
+try{setNightMode(localStorage.getItem('atlas-night')==='1',false);}catch{setNightMode(false,false);}
+$('night-button').addEventListener('click',()=>setNightMode(!state.night));
 $('region-filter').addEventListener('change',()=>{state.region=$('region-filter').value;refreshCollection();closeStory(false);if(state.region==='all')resetView();else if(state.filtered.some(m=>m.coordinates)){if(state.online)expandCluster(state.filtered.filter(m=>m.coordinates));else atlas.fit(state.filtered);}});
 $('retry-data').addEventListener('click',()=>loadStories());
 $('zoom-in').addEventListener('click',()=>state.online?streetMap.zoomIn({duration:reduced?0:250}):atlas.zoom(1.35));$('zoom-out').addEventListener('click',()=>state.online?streetMap.zoomOut({duration:reduced?0:250}):atlas.zoom(1/1.35));$('reset-map').addEventListener('click',resetView);
