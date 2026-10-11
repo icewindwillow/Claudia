@@ -10,7 +10,7 @@ const $=id=>document.getElementById(id);
 const svgNS='http://www.w3.org/2000/svg';
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const small=()=>matchMedia('(max-width: 760px)').matches;
-// A slightly tighter opening composition keeps Britain and the place clusters
+// A slightly tighter opening composition keeps Chongqing and the cat clusters
 // visually present without losing the atlas-style breathing room.
 const DEFAULT_OVERVIEW_ZOOM=1.15;
 const state={real:[],demos:[],items:[],filtered:[],region:'all',query:'',selected:null,online:false,loadingStreet:false};
@@ -88,7 +88,18 @@ class OverviewMap{
     const r=s/c.s;this.camera={s,x:point[0]-(point[0]-c.x)*r,y:point[1]-(point[1]-c.y)*r};this.render();
   }
   pan(dx,dy){cancelAnimationFrame(this.animation);this.camera.x+=dx;this.camera.y+=dy;this.constrain();this.render();}
-  constrain(){const c=this.camera,p=this.toGeo([this.width/2,this.height/2]);const q=project([Math.max(-13,Math.min(7,p[0])),Math.max(48,Math.min(63,p[1]))]);c.x=this.width/2-q[0]*c.s;c.y=this.height/2-q[1]*c.s;}
+  constrain(){
+    // Keep the viewport anchored to Chongqing. The old implementation still
+    // clamped the camera to the former UK extent, so a small drag on mobile
+    // sent the Chongqing map to a blank area around Europe.
+    const c=this.camera,p=this.toGeo([this.width/2,this.height/2]);
+    const q=project([
+      Math.max(MAP_BOUNDS[0],Math.min(MAP_BOUNDS[2],p[0])),
+      Math.max(MAP_BOUNDS[1],Math.min(MAP_BOUNDS[3],p[1]))
+    ]);
+    c.x=this.width/2-q[0]*c.s;
+    c.y=this.height/2-q[1]*c.s;
+  }
   bind(){
     const pos=e=>{const r=this.surface.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];};
     this.surface.addEventListener('pointerdown',e=>{
