@@ -2,6 +2,7 @@ import {showGuests} from './guests.v0.8.js';
 import {normalizeCategory,categoryOf,categoryIcon,ratingTone,CATEGORIES} from './place-style.v0.8.js?v=0.9.2';
 import {OVERVIEW_MAX_ZOOM,clusterBounds,coincident} from './cluster-view.v0.6.js';
 import {StreetMap, GeoBounds, readStreetConfig} from './streets.v0.4.js';
+import {AMapStreetMap} from './amap.v0.1.js';
 import {MAP_BOUNDS,REGIONS,project,unproject,validateMemories,filterMemories,clusterPoints,featurePath,validRating,starFills,photosOf,mergeMemories,publishableMemories} from './geo.v0.5.js';
 import {sortMemories} from './collection.v0.5.js';
 import {breedIcon} from './cat-breeds.v0.1.js';
@@ -17,8 +18,9 @@ const CITY_BOUNDS=[106.20,29.08,107.04,30.18];
 const CITY_DISTRICTS=new Set(['渝中区','大渡口区','江北区','沙坪坝区','九龙坡区','南岸区','北碚区','渝北区','巴南区']);
 const DEFAULT_OVERVIEW_ZOOM=1.15;
 const CITY_DEFAULT_ZOOM=1.22;
-const CITY_TO_OVERVIEW_THRESHOLD=.72;
-const OVERVIEW_TO_CITY_THRESHOLD=1.65;
+const CITY_TO_OVERVIEW_THRESHOLD=.58;
+const OVERVIEW_TO_CITY_THRESHOLD=1.9;
+const LEVEL_SWITCH_COOLDOWN=900;
 const MIN_CITY_ZOOM=.42;
 const state={real:[],demos:[],items:[],filtered:[],region:'all',query:'',selected:null,online:false,loadingStreet:false};
 const icon=name=>{const s=document.createElementNS(svgNS,'svg');s.setAttribute('class','icon');s.setAttribute('aria-hidden','true');const u=document.createElementNS(svgNS,'use');u.setAttribute('href',`#i-${name}`);s.append(u);return s;};
@@ -34,7 +36,7 @@ async function readJson(path,key){
 
 class OverviewMap{
   constructor(){
-    this.surface=$('map-surface');this.svg=$('atlas-svg');this.group=$('geographic-layer');this.clip=$('chongqing-art-clip');this.camera={s:1,x:0,y:0};this.base=1;this.width=0;this.height=0;this.points=new Map();this.animation=0;this.level='city';this.geography=null;this.cityFeatures=[];
+    this.surface=$('map-surface');this.svg=$('atlas-svg');this.group=$('geographic-layer');this.clip=$('chongqing-art-clip');this.camera={s:1,x:0,y:0};this.base=1;this.width=0;this.height=0;this.points=new Map();this.animation=0;this.level='city';this.levelSwitchLockUntil=0;this.geography=null;this.cityFeatures=[];
     this.surface.tabIndex=0;this.surface.setAttribute('role','region');this.surface.setAttribute('aria-label','互动地图。方向键移动，加减号缩放，Home 回到全览。');
     new ResizeObserver(()=>this.resize()).observe(this.surface);
     this.bind();
@@ -47,14 +49,16 @@ class OverviewMap{
   setLevel(level='city',animated=true,announce=true){
     const next=level==='overview'?'overview':'city';
     if(!this.geography)return;
+    const changed=this.level!==next;
     this.level=next;
+    if(changed)this.levelSwitchLockUntil=performance.now()+LEVEL_SWITCH_COOLDOWN;
     const features=next==='city'?this.cityFeatures:this.geography.features.filter(f=>f.properties?.kind==='land');
     const clipFrag=document.createDocumentFragment();
     for(const f of features){const p=document.createElementNS(svgNS,'path');p.setAttribute('d',featurePath(f));clipFrag.append(p);}
     this.clip.replaceChildren(clipFrag);
     const [west,south,east,north]=next==='city'?CITY_BOUNDS:MAP_BOUNDS;
     const top=project([west,north])[1],bottom=project([west,south])[1];
-    const art=document.createElementNS(svgNS,'image');art.classList.add('map-art',next==='city'?'urban-map-art':'regional-map-art');art.setAttribute('href',next==='city'?'./assets/maps/chongqing-urban-picturebook-v2.svg':'./assets/maps/chongqing-handdrawn-map-v4.webp');art.setAttribute('x',String(west));art.setAttribute('y',String(top));art.setAttribute('width',String(east-west));art.setAttribute('height',String(bottom-top));art.setAttribute('preserveAspectRatio','none');art.setAttribute('clip-path','url(#chongqing-art-clip)');
+    const art=document.createElementNS(svgNS,'image');art.classList.add('map-art',next==='city'?'urban-map-art':'regional-map-art');art.setAttribute('href',next==='city'?'./assets/maps/chongqing-urban-fb043-v1.webp':'./assets/maps/chongqing-overview-fb019-v1.webp');art.setAttribute('x',String(west));art.setAttribute('y',String(top));art.setAttribute('width',String(east-west));art.setAttribute('height',String(bottom-top));art.setAttribute('preserveAspectRatio','none');art.setAttribute('clip-path','url(#chongqing-art-clip)');
     const frag=document.createDocumentFragment();
     frag.append(art);
     for(const f of features){const p=document.createElementNS(svgNS,'path');p.setAttribute('d',featurePath(f));p.setAttribute('class',next==='city'?'coast-city-boundary':`coast-${f.properties.kind}`);frag.append(p);}
@@ -112,8 +116,9 @@ class OverviewMap{
   zoom(factor,point=[this.width/2,this.height/2]){
     cancelAnimationFrame(this.animation);const c=this.camera;
     const requested=c.s*factor,ratio=requested/this.base;
-    if(this.level==='city'&&ratio<CITY_TO_OVERVIEW_THRESHOLD){this.setLevel('overview',true);return;}
-    if(this.level==='overview'&&ratio>OVERVIEW_TO_CITY_THRESHOLD){this.setLevel('city',true);return;}
+    const canSwitch=performance.now()>=this.levelSwitchLockUntil;
+    if(canSwitch&&this.level==='city'&&ratio<CITY_TO_OVERVIEW_THRESHOLD){this.setLevel('overview',true);return;}
+    if(canSwitch&&this.level==='overview'&&ratio>OVERVIEW_TO_CITY_THRESHOLD){this.setLevel('city',true);return;}
     const minimum=this.level==='city'?this.base*MIN_CITY_ZOOM:this.base*.72;
     const s=Math.max(minimum,Math.min(this.base*OVERVIEW_MAX_ZOOM,requested));
     if(s===c.s&&factor>1)notify('总览已经放大到上限。具体道路请切换「街道底图」。');
@@ -299,15 +304,16 @@ async function enterStreet(focus=null){
     const holder=$('online-map');holder.hidden=false;holder.style.opacity='0';holder.style.pointerEvents='none';
     const center=focus||atlas.toGeo([atlas.width/2,atlas.height/2]);
     const zoom=focus?16:Math.max(4,Math.log2(atlas.camera.s*360/256));
-    const thisMap=streetMap=new StreetMap({container:holder,center,zoom,config,onStatus:d=>{
+    const StreetRenderer=config.amapKey?AMapStreetMap:StreetMap;
+    const thisMap=streetMap=new StreetRenderer({container:holder,center,zoom,config,onStatus:d=>{
       if(token!==streetToken)return;
       if(state.loadingStreet)notify(`正在读取街道图片 ${d.loaded}/${d.total}…${d.failed?' 部分图片暂不可用。':''}`,0);
       if(state.online&&d.failed){$('street-retry').hidden=false;notify(`部分街道图片未加载（${d.failed} 张）。${d.error||''}`,0);}
-      else if(state.online&&!d.pending){$('street-retry').hidden=true;if(d.loaded)notify('街道地图 · 拖动探索，放大可看道路与建筑。',2500);}
+      else if(state.online&&!d.pending){$('street-retry').hidden=true;if(d.loaded)notify(config.amapKey?'高德街道地图 · 真实道路与猫咪坐标已叠加。':'街道地图 · 拖动探索，放大可看道路与建筑。',2500);}
     }});
     await thisMap.waitForReady();if(token!==streetToken)return;
     state.online=true;$('atlas-svg').hidden=true;$('map-frame').classList.add('is-online');holder.style.opacity='1';holder.style.pointerEvents='auto';
-    $('street-attribution').hidden=false;$('street-button').setAttribute('aria-pressed','true');$('overview-button').setAttribute('aria-pressed','false');
+    $('street-attribution').hidden=false;$('street-attribution').innerHTML=config.amapKey?'© <a href="https://lbs.amap.com/" target="_blank" rel="noopener">高德地图</a> · 地图数据及服务由高德地图提供':'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener">报告地图问题</a>';$('street-button').setAttribute('aria-pressed','true');$('overview-button').setAttribute('aria-pressed','false');
     thisMap.on('move',renderOverlays);thisMap.on('resize',renderOverlays);renderOverlays();
     notify('街道地图已显示。照片和故事标记保持原来的地理坐标。',3500);
   }catch(error){

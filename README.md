@@ -7,6 +7,8 @@
 - 检查：`npm run check`
 - 当前地图覆盖重庆，区县总览与街道瓦片使用 WGS84 坐标；猫咪记录从空白开始；每条记录以猫咪为核心，遇见地点、地址和坐标作为猫咪属性。原英国记录保留在历史提交中，不展示。
 - 猫咪记录支持品种、状态、重复撸猫日期、照片与相遇位置；地图放大后会显示对应品种贴纸图标，图标素材在 `public/assets/cat-breeds/`。
+- 街道底图优先使用高德 JS API，并在地图层应用轻微纸张滤镜；没有高德配置时回退到现有街道图源。仅本地预览时，将 `public/assets/amap-config.example.js` 复制为 `public/assets/amap-config.js` 并填写 Web 端 JS API Key。该文件已加入 `.gitignore`，不会进入 GitHub。
+- Cloudflare Pages 部署时，在项目环境变量中设置 `AMAP_JS_KEY`（可选 `AMAP_STYLE`），不要把 Key 写进已跟踪文件。高德 Key 应设置域名白名单，并保留高德署名。
 - 如需上线，在 Cloudflare Pages 新建项目并连接新仓库，输出目录填写 `public`。作者后台需单独配置 D1 数据库、Cloudflare Access 与作者邮箱，勿绑定原地图数据库。
 - 不复制旧项目的部署环境、密钥或线上数据库。
 

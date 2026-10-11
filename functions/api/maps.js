@@ -1,5 +1,9 @@
 import {json, VERSION} from '../../server/http.mjs';
 import {STREET_CONFIG} from '../../server/tiles.mjs';
-export function onRequest({request}) {
-  return request.method==='GET'?json({ok:true,version:VERSION,...STREET_CONFIG}):json({ok:false,message:'只支持 GET'},405);
+export function onRequest({request,env={}}) {
+  if(request.method!=='GET')return json({ok:false,message:'只支持 GET'},405);
+  const config={ok:true,version:VERSION,...STREET_CONFIG};
+  if(typeof env.AMAP_JS_KEY==='string'&&env.AMAP_JS_KEY.trim())config.amapKey=env.AMAP_JS_KEY.trim();
+  if(typeof env.AMAP_STYLE==='string'&&env.AMAP_STYLE.trim())config.amapStyle=env.AMAP_STYLE.trim();
+  return json(config);
 }

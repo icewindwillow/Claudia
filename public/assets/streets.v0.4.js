@@ -16,7 +16,8 @@ export async function readStreetConfig(){
   const data=await r.json();
   if(!r.ok||!data.ok)throw new Error(`${data.code||'MAP_CONFIG_ERROR'}：${data.message||'地图接口尚未就绪。'}`);
   if(data.tileTemplate!=='/api/tiles/{z}/{x}/{y}.png')throw new Error('MAP_CONFIG_ERROR：地图地址必须使用本站固定接口。');
-  return data;
+  const local=window.__AMAP_CONFIG__&&typeof window.__AMAP_CONFIG__==='object'?window.__AMAP_CONFIG__:{};
+  return {...data,amapKey:String(data.amapKey||local.key||'').trim(),amapStyle:String(data.amapStyle||local.style||'amap://styles/whitesmoke').trim()};
 }
 export class StreetMap {
   constructor({container,center,zoom,config,onStatus=()=>{}}){

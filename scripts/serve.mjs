@@ -20,7 +20,7 @@ const server = http.createServer(async (req, res) => {
     catch { res.writeHead(400).end("Bad request"); return; }
     if (pathname === '/api/maps' || pathname.startsWith('/api/tiles/')) {
       const request = new Request(`http://127.0.0.1:${port}${req.url}`, {method:req.method, headers:req.headers});
-      const response = pathname === '/api/maps' ? mapConfig({request}) : await serveTile({request}, {cache:null});
+      const response = pathname === '/api/maps' ? mapConfig({request,env:process.env}) : await serveTile({request}, {cache:null});
       res.writeHead(response.status, Object.fromEntries(response.headers));
       res.end(req.method === 'HEAD' ? undefined : Buffer.from(await response.arrayBuffer()));
       return;

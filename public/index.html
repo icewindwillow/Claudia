@@ -9,7 +9,8 @@
   <title>竹喵的撸猫地图</title>
   <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./assets/style.v0.4.css">
-  <script type="module" src="./assets/app.v0.8.js?v=1.3.9"></script>
+  <script src="./assets/amap-config.js?v=1" defer></script>
+  <script type="module" src="./assets/app.v0.8.js?v=1.3.11"></script>
   <link rel="stylesheet" href="./assets/collection.v0.5.css">
   <link rel="stylesheet" href="./assets/collection.v0.7.1.css">
   <link rel="stylesheet" href="./assets/collection.v0.9.css">
@@ -73,7 +74,7 @@
       <div class="map-key"><span class="key-dot"></span><span id="map-key-label">猫咪分布</span><i></i><span class="map-hint">拖动探索 · 滚轮缩放</span></div>
       <div class="scale-wrap" id="scale-wrap"><span id="scale-text">200 km</span><span class="scale-line" id="scale-line"></span></div>
       <div class="geo-attribution" id="geo-attribution"><button type="button" id="sources-button">重庆区县边界 · 数据来源 ⓘ</button></div>
-      <div class="street-attribution" id="street-attribution" hidden>© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener">报告地图问题</a></div><button type="button" class="street-retry" id="street-retry" hidden>重试街道图片</button>
+      <div class="street-attribution" id="street-attribution" hidden>© <a href="https://lbs.amap.com/" target="_blank" rel="noopener">高德地图</a> · 地图数据及服务由高德地图提供</div><button type="button" class="street-retry" id="street-retry" hidden>重试街道图片</button>
       <div class="map-status" id="map-status" role="status" aria-live="polite">正在展开地图…</div>
       <dialog class="story-panel" id="story-panel" aria-labelledby="story-place">
         <div class="story-head"><span id="story-kind" class="eyebrow">猫咪相册</span><button id="close-story" class="story-close" type="button"><span>返回地图</span><svg class="icon"><use href="#i-close"/></svg></button></div>
@@ -110,9 +111,9 @@
   <dialog class="about-dialog" id="about-dialog" aria-labelledby="about-title">
     <div class="dialog-top"><button id="close-about" class="icon-button" type="button" aria-label="关闭说明">×</button></div>
     <h2 id="about-title">地图说明</h2><p>查看重庆的猫咪、遇见位置、照片与评分。作者登录后可新增或编辑猫咪记录。</p>
-    <p>区县边界：阿里云 DataV 重庆边界数据，已转换为 WGS84 坐标，仅供概括总览。街道底图：© OpenStreetMap contributors。</p>
+    <p>区县边界：阿里云 DataV 重庆边界数据，已转换为 WGS84 坐标，仅供概括总览。街道底图：高德地图。</p>
     <p>遇见位置搜索使用 OpenStreetMap / Photon；未收录的遇见位置可在地图上手动选点。地图不请求设备定位。</p>
-    <p><a href="https://geo.datav.aliyun.com/areas_v3/bound/500000_full.json" target="_blank" rel="noopener noreferrer">区县边界来源</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">街道底图来源</a></p><button type="button" id="about-author" class="author-tool-link">进入作者后台 ↗</button>
+    <p><a href="https://geo.datav.aliyun.com/areas_v3/bound/500000_full.json" target="_blank" rel="noopener noreferrer">区县边界来源</a> · <a href="https://lbs.amap.com/" target="_blank" rel="noopener noreferrer">高德地图服务说明</a></p><button type="button" id="about-author" class="author-tool-link">进入作者后台 ↗</button>
   </dialog>
 
   <dialog id="photo-viewer" class="photo-viewer" aria-labelledby="viewer-title">

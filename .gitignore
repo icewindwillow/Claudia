@@ -3,6 +3,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+/public/assets/amap-config.js
 .wrangler/
 coverage/
 *.log
