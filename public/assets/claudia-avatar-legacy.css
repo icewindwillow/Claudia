@@ -1,0 +1,10 @@
+/* Backup of the pre-transparent avatar treatment. This file is intentionally not loaded. */
+.pin-dot.breed-pin{width:30px;height:30px;padding:0;background:#f8f5e9;border:2px solid #fffdf2;display:grid;place-items:center;overflow:hidden}
+.pin-dot.breed-pin .breed-icon{width:34px;height:34px;flex-basis:34px}
+.map-marker.multi-cat .pin-hit{left:-45px;top:-22px;width:90px;height:44px}
+.pin-dot.multi-cat-pin{width:auto;min-width:58px;height:36px;padding:2px 5px;background:#f8f5e9;border:2px solid #fffdf2;border-radius:20px;display:flex;align-items:center;justify-content:center;overflow:visible;gap:0;box-shadow:0 0 0 1px #a35a4666,0 2px 7px #52604133}
+.cat-avatar{width:27px;height:27px;flex:0 0 27px;margin-left:-7px;border:2px solid #fffdf2;border-radius:50%;background:#dce6d0;display:grid;place-items:center;overflow:hidden;box-shadow:0 1px 3px #52604140}
+.cat-avatar:first-child{margin-left:0}
+.cat-avatar .breed-icon{width:30px;height:30px;flex-basis:30px}
+.cat-avatar .category-icon{width:17px;height:17px;color:#527052}
+.cat-more{height:24px;min-width:24px;margin-left:3px;padding:0 4px;border-radius:12px;background:#314a38;color:#f4f3df;display:grid;place-items:center;font:600 10px/1 var(--sans);white-space:nowrap}
