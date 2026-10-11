@@ -7,6 +7,8 @@ function loadScript(config){
   if(loader)return loader;
   const key=String(config.amapKey||'').trim();
   if(!key)throw new Error('AMAP_KEY_MISSING：尚未配置高德地图 JS API Key。');
+  const securityCode=String(config.amapSecurityCode||'').trim();
+  if(securityCode)window._AMapSecurityConfig={...(window._AMapSecurityConfig||{}),securityJsCode:securityCode};
   loader=new Promise((resolve,reject)=>{
     const script=document.createElement('script');
     const params=new URLSearchParams({v:'2.0',key,plugin:'AMap.Scale'});
@@ -34,7 +36,7 @@ export class AMapStreetMap {
     this.map.on('moveend',()=>{this.emit('move');this.emit('idle');});
     this.map.on('zoomend',()=>{this.emit('move');this.emit('idle');});
     this.map.on('resize',()=>this.emit('resize'));
-    await new Promise((resolve,reject)=>{let done=false;const finish=(fn)=>{if(done)return;done=true;fn();};const timer=setTimeout(()=>finish(()=>reject(new Error('AMAP_TIMEOUT：高德地图加载超时。'))),12000);this.map.on('complete',()=>{clearTimeout(timer);finish(resolve);});this.map.on('error',e=>{clearTimeout(timer);finish(()=>reject(new Error(`AMAP_ERROR：${e?.type||'地图加载失败'}。`)));});});
+    await new Promise((resolve,reject)=>{let done=false;const finish=(fn)=>{if(done)return;done=true;fn();};const timer=setTimeout(()=>finish(()=>reject(new Error('AMAP_TIMEOUT：高德地图加载超时，请检查 Key 的域名白名单和安全密钥配置。'))),20000);this.map.on('complete',()=>{clearTimeout(timer);finish(resolve);});this.map.on('error',e=>{clearTimeout(timer);finish(()=>reject(new Error(`AMAP_ERROR：${e?.type||'地图加载失败'}。`)));});});
     this.emit('ready');return this;
   }
   waitForReady(){return this.ready;}

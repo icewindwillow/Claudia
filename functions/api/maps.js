@@ -5,5 +5,6 @@ export function onRequest({request,env={}}) {
   const config={ok:true,version:VERSION,...STREET_CONFIG};
   if(typeof env.AMAP_JS_KEY==='string'&&env.AMAP_JS_KEY.trim())config.amapKey=env.AMAP_JS_KEY.trim();
   if(typeof env.AMAP_STYLE==='string'&&env.AMAP_STYLE.trim())config.amapStyle=env.AMAP_STYLE.trim();
+  if(typeof env.AMAP_JS_SECURITY_CODE==='string'&&env.AMAP_JS_SECURITY_CODE.trim())config.amapSecurityCode=env.AMAP_JS_SECURITY_CODE.trim();
   return json(config);
 }
