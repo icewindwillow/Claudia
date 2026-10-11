@@ -31,7 +31,8 @@ export class AMapStreetMap {
   }
   async init(){
     const AMap=await loadScript(this.config);if(this.destroyed)throw new Error('AMAP_CANCELLED：地图已切换。');
-    this.map=new AMap.Map(this.container,{center:this.center,zoom:this.zoom,viewMode:'2D',mapStyle:this.config.amapStyle||'amap://styles/whitesmoke',resizeEnable:true,showLabel:true,dragEnable:true,zoomEnable:true,doubleClickZoom:true,keyboardEnable:true,rotateEnable:false,pitchEnable:false,animateEnable:true});
+    // Use AMap's public standard style so a private or stale style ID cannot leave a blank canvas.
+    this.map=new AMap.Map(this.container,{center:this.center,zoom:this.zoom,viewMode:'2D',mapStyle:'amap://styles/normal',resizeEnable:true,showLabel:true,dragEnable:true,zoomEnable:true,doubleClickZoom:true,keyboardEnable:true,rotateEnable:false,pitchEnable:false,animateEnable:true});
     this.map.on('complete',()=>this.emit('ready'));
     this.map.on('moveend',()=>{this.emit('move');this.emit('idle');});
     this.map.on('zoomend',()=>{this.emit('move');this.emit('idle');});

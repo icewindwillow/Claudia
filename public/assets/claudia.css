@@ -10,7 +10,7 @@ html{color-scheme:dark}body{background:#0c100f;color:var(--ink);font-family:var(
 .map-frame{min-width:0;min-height:0;background:#101715;border:1px solid #354b3c;border-radius:14px}.coast-land{fill:#2e4839;stroke:#829b78;stroke-width:1.1}.map-grain{display:none}.map-caption{top:24px;left:24px}.map-caption .eyebrow,.map-caption>span:last-child{color:#c6d6c6}.map-caption .eyebrow{font-size:10px}.geo-label{max-width:120px;text-align:center;letter-spacing:0!important;font-family:var(--sans)!important}.geo-label strong{color:#e6efd9!important;font:600 12px/1.5 var(--sans)!important;text-shadow:0 1px 3px #102316}.map-style-switch,.map-controls{background:#1d2a21;border:1px solid #52654f;border-radius:9px}.map-style-switch button,.map-controls button{color:#c5d7bd}.map-style-switch button[aria-pressed=true]{background:#b9d69e;color:#172515}.map-controls button:hover{background:#354b36}.compass,.map-key,.scale-wrap,.geo-attribution,.geo-attribution button{color:#a9c39f}.scale-line{border-color:#9bb391}.map-status{background:#24382b;color:#e1edd8;border-color:#698560}.map-key{bottom:20px}.geo-attribution{bottom:5px}.map-dedication,.site-footer{display:none}
 .map-frame:not(.is-online) .map-surface{background:#e8e1cf}
 .map-dim{position:absolute;inset:0;background:rgba(8,14,11,.2);pointer-events:none;z-index:2}
-.map-frame.is-online .map-dim{background:rgba(8,14,11,.16)}
+.map-frame.is-online .map-dim{display:none}
 .map-frame:not(.is-online) .coast-land{fill:rgba(61,91,70,.16);stroke:#3f5e4b;stroke-width:1.15}
 .map-frame:not(.is-online) .coast-water{fill:rgba(128,171,164,.12);stroke:#587c76}
 .map-frame:not(.is-online) .coast-boundary{stroke:#6b7d68;stroke-dasharray:3 3;opacity:.75}
@@ -19,7 +19,7 @@ html{color-scheme:dark}body{background:#0c100f;color:var(--ink);font-family:var(
 .map-frame:not(.is-online) .geo-label strong{color:#fff!important;text-shadow:0 1px 4px #102316,0 0 2px #102316}
 .map-frame:not(.is-online) .geo-label{color:#fff}
 .map-frame:not(.is-online) .map-caption .eyebrow,.map-frame:not(.is-online) .map-caption>span:last-child{color:#fff;text-shadow:0 1px 3px #102316}
-.map-frame.is-online .amap-street-map{background:#e4e1d7;filter:saturate(.72) contrast(1.06) sepia(.08) brightness(1.01);}
+.map-frame.is-online .amap-street-map{background:#e4e1d7;filter:none}
 .map-frame.is-online .amap-container{font-family:var(--sans);}
 .map-frame.is-online .street-attribution{background:#19221ce8;color:#d9e6d3;}
 .map-frame.is-online .street-attribution a{color:#d9e6d3;}
