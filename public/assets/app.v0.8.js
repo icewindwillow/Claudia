@@ -383,11 +383,12 @@ try{const saved=localStorage.getItem('atlas-sort');if(['default','rating-desc','
 function setNightMode(enabled,announce=true){
   state.night=Boolean(enabled);$('map-frame').classList.toggle('is-night',state.night);
   $('night-button').setAttribute('aria-pressed',String(state.night));$('night-button').setAttribute('aria-label',state.night?'切换到日间模式':'切换到夜景模式');$('night-button').title=state.night?'切换到日间模式':'切换到夜景模式';
-  try{localStorage.setItem('atlas-night',state.night?'1':'0');}catch{}
   if(announce)notify(state.night?'夜景模式 · 猫咪暖光已开启。':'日间模式 · 已恢复清晰底图。',2200);
   renderOverlays();
 }
-try{setNightMode(localStorage.getItem('atlas-night')==='1',false);}catch{setNightMode(false,false);}
+const browserColorScheme=matchMedia('(prefers-color-scheme: dark)');
+setNightMode(browserColorScheme.matches,false);
+browserColorScheme.addEventListener?.('change',event=>setNightMode(event.matches,true));
 $('night-button').addEventListener('click',()=>setNightMode(!state.night));
 $('region-filter').addEventListener('change',()=>{state.region=$('region-filter').value;refreshCollection();closeStory(false);if(state.region==='all')resetView();else if(state.filtered.some(m=>m.coordinates)){if(state.online)expandCluster(state.filtered.filter(m=>m.coordinates));else atlas.fit(state.filtered);}});
 $('retry-data').addEventListener('click',()=>loadStories());
