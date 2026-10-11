@@ -26,14 +26,22 @@ async function readJson(path,key){
 
 class OverviewMap{
   constructor(){
-    this.surface=$('map-surface');this.svg=$('atlas-svg');this.group=$('geographic-layer');this.camera={s:1,x:0,y:0};this.base=1;this.width=0;this.height=0;this.points=new Map();this.animation=0;
+    this.surface=$('map-surface');this.svg=$('atlas-svg');this.group=$('geographic-layer');this.clip=$('chongqing-art-clip');this.camera={s:1,x:0,y:0};this.base=1;this.width=0;this.height=0;this.points=new Map();this.animation=0;
     this.surface.tabIndex=0;this.surface.setAttribute('role','region');this.surface.setAttribute('aria-label','互动地图。方向键移动，加减号缩放，Home 回到全览。');
     new ResizeObserver(()=>this.resize()).observe(this.surface);
     this.bind();
   }
   setGeography(data){
     if(data?.type!=='FeatureCollection'||!Array.isArray(data.features))throw new Error('总览地理数据格式不正确。');
+    const land=data.features.filter(f=>f.properties?.kind==='land');
+    const clipFrag=document.createDocumentFragment();
+    for(const f of land){const p=document.createElementNS(svgNS,'path');p.setAttribute('d',featurePath(f));clipFrag.append(p);}
+    this.clip.replaceChildren(clipFrag);
+    const [west,south,east,north]=MAP_BOUNDS;
+    const top=project([west,north])[1],bottom=project([west,south])[1];
+    const art=document.createElementNS(svgNS,'image');art.classList.add('map-art');art.setAttribute('href','./assets/maps/chongqing-handdrawn-map-v2.webp');art.setAttribute('x',String(west));art.setAttribute('y',String(top));art.setAttribute('width',String(east-west));art.setAttribute('height',String(bottom-top));art.setAttribute('preserveAspectRatio','none');art.setAttribute('clip-path','url(#chongqing-art-clip)');
     const frag=document.createDocumentFragment();
+    frag.append(art);
     for(const f of data.features){const p=document.createElementNS(svgNS,'path');p.setAttribute('d',featurePath(f));p.setAttribute('class',`coast-${f.properties.kind}`);frag.append(p);}
     this.group.replaceChildren(frag);this.reset(false);
   }
