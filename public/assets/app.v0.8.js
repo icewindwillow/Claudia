@@ -148,7 +148,7 @@ function renderOverlays(){
   const breedZoom=true;
   const labelBoxes=[];labelData.forEach((d,i)=>{const el=labelEls[i],p=atlas.screen(d.point);const width=Math.min(120,d.zh.length*12),box={x:p[0]-width/2,y:p[1]-9,w:width,h:18};const overlap=labelBoxes.some(b=>box.x<b.x+b.w+6&&box.x+box.w+6>b.x&&box.y<b.y+b.h+4&&box.y+box.h+4>b.y);el.style.left=`${p[0]}px`;el.style.top=`${p[1]}px`;el.hidden=state.online||p[0]<0||p[0]>w||p[1]<10||p[1]>h-25||zoomRatio>10||overlap;if(!el.hidden)labelBoxes.push(box);el.style.opacity='1';});
   const groups=clusterPoints(state.filtered,screenPoint,small()?29:31);
-  const allPins=groups.map(g=>({x:g.x-14,y:g.y-14,w:28,h:28}));
+  const allPins=groups.map(g=>{const size=g.items.length>3?88:g.items.length>1?70:28;return {x:g.x-size/2,y:g.y-size/2,w:size,h:size};});
   const placed=[];const keep=new Set();
   const overlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
   for(const g of groups){
@@ -161,9 +161,14 @@ function renderOverlays(){
       el.addEventListener('click',()=>{const items=el._items;if(items.length===1)openStory(items[0],el);else expandCluster(items);});
       $('marker-layer').append(el);markerEls.set(key,el);
     }
-    el._items=g.items;el.style.left=`${g.x}px`;el.style.top=`${g.y}px`;el.classList.toggle('cluster',ids.length>1);el.classList.toggle('is-selected',ids.includes(state.selected?.id));
-    el.setAttribute('aria-label',ids.length>1?`展开 ${ids.length} 只猫咪：${g.items.map(m=>m.place).join('、')}`:`${g.items[0].place||g.items[0].title}，${g.items[0].demo?'演示猫咪':'查看猫咪记录'}`);
-    const dot=el.querySelector('.pin-dot');dot.replaceChildren();dot.classList.remove('breed-pin');el.dataset.ratingTone=ids.length===1?ratingTone(g.items[0].review?.rating):'unrated';if(ids.length>1)dot.textContent=String(ids.length);else{const breed=breedZoom&&breedIcon(g.items[0].breed);if(breed){dot.classList.add('breed-pin');dot.append(breed);}else dot.append(categoryIcon(g.items[0].category));el.setAttribute('aria-label',`${g.items[0].place}，${g.items[0].breed||'品种未知'}，${categoryOf(g.items[0].category)}，${g.items[0].review?.rating==null?'尚未评分':g.items[0].review.rating+' 星'}，查看猫咪记录`);}
+    el._items=g.items;el.style.left=`${g.x}px`;el.style.top=`${g.y}px`;el.classList.toggle('cluster',ids.length>1);el.classList.toggle('multi-cat',ids.length>1);el.classList.toggle('cluster-many',ids.length>3);el.classList.toggle('is-selected',ids.includes(state.selected?.id));
+    el.setAttribute('aria-label',ids.length>1?`展开 ${ids.length} 只猫咪：${g.items.map(m=>m.place||m.title).join('、')}`:`${g.items[0].place||g.items[0].title}，${g.items[0].demo?'演示猫咪':'查看猫咪记录'}`);
+    const dot=el.querySelector('.pin-dot');dot.replaceChildren();dot.classList.remove('breed-pin','multi-cat-pin');el.dataset.ratingTone=ids.length===1?ratingTone(g.items[0].review?.rating):'unrated';
+    if(ids.length>1){
+      dot.classList.add('multi-cat-pin');
+      g.items.slice(0,3).forEach(m=>{const avatar=text('span','cat-avatar');const breed=breedZoom&&breedIcon(m.breed);avatar.append(breed||categoryIcon(m.category));avatar.title=m.breed||'品种未知';dot.append(avatar);});
+      if(ids.length>3)dot.append(text('span','cat-more',`+${ids.length-3}`));
+    }else{const breed=breedZoom&&breedIcon(g.items[0].breed);if(breed){dot.classList.add('breed-pin');dot.append(breed);}else dot.append(categoryIcon(g.items[0].category));el.setAttribute('aria-label',`${g.items[0].place}，${g.items[0].breed||'品种未知'}，${categoryOf(g.items[0].category)}，${g.items[0].review?.rating==null?'尚未评分':g.items[0].review.rating+' 星'}，查看猫咪记录`);}
     const label=el.querySelector('.pin-label');label.replaceChildren(text('span','',ids.length>1?`${ids.length} 只猫咪`:(g.items[0].place||g.items[0].title)));
     if(ids.length===1&&g.items[0].placeEn)label.append(text('small','',g.items[0].placeEn));
     const labelW=label.offsetWidth||100,labelH=label.offsetHeight||28;
