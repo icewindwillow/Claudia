@@ -134,7 +134,10 @@ function screenPoint(coords){if(state.online&&streetMap){const p=streetMap.proje
 function renderOverlays(){
   if(!atlas?.width)return;
   const w=atlas.width,h=atlas.height,zoomRatio=atlas.camera.s/atlas.base;
-  const breedZoom=state.online?(streetMap?.getZoom()||0)>=14:zoomRatio>=2.1;
+  // Breed stickers stay visible on the Chongqing overview too, so a location
+  // is recognisable as a cat at the first map level. Clusters still use their
+  // count badge when several cats share the same nearby area.
+  const breedZoom=true;
   const labelBoxes=[];labelData.forEach((d,i)=>{const el=labelEls[i],p=atlas.screen(d.point);const width=Math.min(120,d.zh.length*12),box={x:p[0]-width/2,y:p[1]-9,w:width,h:18};const overlap=labelBoxes.some(b=>box.x<b.x+b.w+6&&box.x+box.w+6>b.x&&box.y<b.y+b.h+4&&box.y+box.h+4>b.y);el.style.left=`${p[0]}px`;el.style.top=`${p[1]}px`;el.hidden=state.online||p[0]<0||p[0]>w||p[1]<10||p[1]>h-25||zoomRatio>10||overlap;if(!el.hidden)labelBoxes.push(box);el.style.opacity='1';});
   const groups=clusterPoints(state.filtered,screenPoint,small()?29:31);
   const allPins=groups.map(g=>({x:g.x-14,y:g.y-14,w:28,h:28}));
