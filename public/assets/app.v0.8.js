@@ -16,6 +16,10 @@ const small=()=>matchMedia('(max-width: 760px)').matches;
 const CITY_BOUNDS=[106.20,29.08,107.04,30.18];
 const CITY_DISTRICTS=new Set(['渝中区','大渡口区','江北区','沙坪坝区','九龙坡区','南岸区','北碚区','渝北区','巴南区']);
 const DEFAULT_OVERVIEW_ZOOM=1.15;
+const CITY_DEFAULT_ZOOM=1.22;
+const CITY_TO_OVERVIEW_THRESHOLD=.62;
+const OVERVIEW_TO_CITY_THRESHOLD=1.65;
+const MIN_CITY_ZOOM=.42;
 const state={real:[],demos:[],items:[],filtered:[],region:'all',query:'',selected:null,online:false,loadingStreet:false};
 const icon=name=>{const s=document.createElementNS(svgNS,'svg');s.setAttribute('class','icon');s.setAttribute('aria-hidden','true');const u=document.createElementNS(svgNS,'use');u.setAttribute('href',`#i-${name}`);s.append(u);return s;};
 const text=(tag,className,value)=>{const el=document.createElement(tag);if(className)el.className=className;if(value!=null)el.textContent=value;return el;};
@@ -50,7 +54,7 @@ class OverviewMap{
     this.clip.replaceChildren(clipFrag);
     const [west,south,east,north]=next==='city'?CITY_BOUNDS:MAP_BOUNDS;
     const top=project([west,north])[1],bottom=project([west,south])[1];
-    const art=document.createElementNS(svgNS,'image');art.classList.add('map-art',next==='city'?'urban-map-art':'regional-map-art');art.setAttribute('href',next==='city'?'./assets/maps/chongqing-urban-picturebook-v1.svg':'./assets/maps/chongqing-handdrawn-map-v4.webp');art.setAttribute('x',String(west));art.setAttribute('y',String(top));art.setAttribute('width',String(east-west));art.setAttribute('height',String(bottom-top));art.setAttribute('preserveAspectRatio','none');art.setAttribute('clip-path','url(#chongqing-art-clip)');
+    const art=document.createElementNS(svgNS,'image');art.classList.add('map-art',next==='city'?'urban-map-art':'regional-map-art');art.setAttribute('href',next==='city'?'./assets/maps/chongqing-urban-picturebook-v2.svg':'./assets/maps/chongqing-handdrawn-map-v4.webp');art.setAttribute('x',String(west));art.setAttribute('y',String(top));art.setAttribute('width',String(east-west));art.setAttribute('height',String(bottom-top));art.setAttribute('preserveAspectRatio','none');art.setAttribute('clip-path','url(#chongqing-art-clip)');
     const frag=document.createDocumentFragment();
     frag.append(art);
     for(const f of features){const p=document.createElementNS(svgNS,'path');p.setAttribute('d',featurePath(f));p.setAttribute('class',next==='city'?'coast-city-boundary':`coast-${f.properties.kind}`);frag.append(p);}
@@ -62,7 +66,7 @@ class OverviewMap{
     const w=this.surface.clientWidth,h=this.surface.clientHeight;if(!w||!h||w===this.width&&h===this.height)return;
     const previous=this.width?this.toGeo([this.width/2,this.height/2]):null;
     const relative=this.camera.s/this.base;this.width=w;this.height=h;
-    const full=this.defaultCamera();this.base=full.s/(this.level==='city'?.90:DEFAULT_OVERVIEW_ZOOM);
+    const full=this.defaultCamera();this.base=full.s/(this.level==='city'?CITY_DEFAULT_ZOOM:DEFAULT_OVERVIEW_ZOOM);
     if(previous&&relative>1.12){const p=project(previous);this.camera={s:full.s*relative,x:w/2-p[0]*full.s*relative,y:h/2-p[1]*full.s*relative};}
     else this.camera=full;
     this.render();if(streetMap)streetMap.resize();
@@ -75,7 +79,7 @@ class OverviewMap{
   }
   defaultCamera(){
     const bounds=this.level==='city'?CITY_BOUNDS:MAP_BOUNDS;
-    const full=this.cameraFor(bounds,false),zoom=this.level==='city'?.90:DEFAULT_OVERVIEW_ZOOM;
+    const full=this.cameraFor(bounds,false),zoom=this.level==='city'?CITY_DEFAULT_ZOOM:DEFAULT_OVERVIEW_ZOOM;
     const left=small()?29:68,right=small()?29:78,top=small()?90:88,bottom=small()?62:67;
     const cx=left+(this.width-left-right)/2,cy=top+(this.height-top-bottom)/2;
     return {s:full.s*zoom,x:cx-(cx-full.x)*zoom,y:cy-(cy-full.y)*zoom};
@@ -90,7 +94,7 @@ class OverviewMap{
     const step=now=>{const t=Math.min(1,(now-started)/650),k=1-(1-t)**3;this.camera={s:from.s+(target.s-from.s)*k,x:from.x+(target.x-from.x)*k,y:from.y+(target.y-from.y)*k};this.render();if(t<1)this.animation=requestAnimationFrame(step);};
     this.animation=requestAnimationFrame(step);
   }
-  reset(animated=true){const c=this.defaultCamera();this.base=c.s/(this.level==='city'?.90:DEFAULT_OVERVIEW_ZOOM);this.animate(c,animated);}
+  reset(animated=true){const c=this.defaultCamera();this.base=c.s/(this.level==='city'?CITY_DEFAULT_ZOOM:DEFAULT_OVERVIEW_ZOOM);this.animate(c,animated);}
   focus(coords,multiplier=2.5){
     if(this.level==='city'&&!insideBounds(coords,CITY_BOUNDS)){this.setLevel('overview',true);}
     const p=project(coords);const s=Math.max(this.base,Math.min(this.base*18,this.base*multiplier));
@@ -107,9 +111,11 @@ class OverviewMap{
   }
   zoom(factor,point=[this.width/2,this.height/2]){
     cancelAnimationFrame(this.animation);const c=this.camera;
-    if(factor<1&&this.level==='city'){this.setLevel('overview',true);return;}
-    if(factor>1&&this.level==='overview'){this.setLevel('city',true);return;}
-    const s=Math.max(this.base*.82,Math.min(this.base*OVERVIEW_MAX_ZOOM,c.s*factor));
+    const requested=c.s*factor,ratio=requested/this.base;
+    if(this.level==='city'&&ratio<CITY_TO_OVERVIEW_THRESHOLD){this.setLevel('overview',true);return;}
+    if(this.level==='overview'&&ratio>OVERVIEW_TO_CITY_THRESHOLD){this.setLevel('city',true);return;}
+    const minimum=this.level==='city'?this.base*MIN_CITY_ZOOM:this.base*.72;
+    const s=Math.max(minimum,Math.min(this.base*OVERVIEW_MAX_ZOOM,requested));
     if(s===c.s&&factor>1)notify('总览已经放大到上限。具体道路请切换「街道底图」。');
     const r=s/c.s;this.camera={s,x:point[0]-(point[0]-c.x)*r,y:point[1]-(point[1]-c.y)*r};this.render();
   }
