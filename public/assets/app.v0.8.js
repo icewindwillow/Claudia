@@ -39,7 +39,7 @@ class OverviewMap{
     this.clip.replaceChildren(clipFrag);
     const [west,south,east,north]=MAP_BOUNDS;
     const top=project([west,north])[1],bottom=project([west,south])[1];
-    const art=document.createElementNS(svgNS,'image');art.classList.add('map-art');art.setAttribute('href','./assets/maps/chongqing-handdrawn-map-v2.webp');art.setAttribute('x',String(west));art.setAttribute('y',String(top));art.setAttribute('width',String(east-west));art.setAttribute('height',String(bottom-top));art.setAttribute('preserveAspectRatio','none');art.setAttribute('clip-path','url(#chongqing-art-clip)');
+    const art=document.createElementNS(svgNS,'image');art.classList.add('map-art');art.setAttribute('href','./assets/maps/chongqing-handdrawn-map-v4.webp');art.setAttribute('x',String(west));art.setAttribute('y',String(top));art.setAttribute('width',String(east-west));art.setAttribute('height',String(bottom-top));art.setAttribute('preserveAspectRatio','none');art.setAttribute('clip-path','url(#chongqing-art-clip)');
     const frag=document.createDocumentFragment();
     frag.append(art);
     for(const f of data.features){const p=document.createElementNS(svgNS,'path');p.setAttribute('d',featurePath(f));p.setAttribute('class',`coast-${f.properties.kind}`);frag.append(p);}
