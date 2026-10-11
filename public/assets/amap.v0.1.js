@@ -35,7 +35,7 @@ function loadScript(config){
 export class AMapStreetMap {
   constructor({container,center,zoom,config,onStatus=()=>{}}){
     this.container=container;this.center=[...center];this.zoom=clamp(zoom,config.minZoom||4,config.maxZoom||19);
-    this.config=config;this.onStatus=onStatus;this.listeners=new Map();this.destroyed=false;this.map=null;
+    this.config=config;this.onStatus=onStatus;this.listeners=new Map();this.destroyed=false;this.map=null;this.moveFrame=0;
     this.life=new AbortController();this.container.replaceChildren();this.container.classList.add('amap-street-map');
     this.container.tabIndex=0;this.container.setAttribute('role','region');this.container.setAttribute('aria-label','高德街道地图。拖动移动，滚轮缩放；方向键移动，加减号缩放。');
     this.ready=this.init();
@@ -49,6 +49,14 @@ export class AMapStreetMap {
     this.map.on('complete',()=>this.emit('ready'));
     this.map.on('moveend',()=>{this.emit('move');this.emit('idle');});
     this.map.on('zoomend',()=>{this.emit('move');this.emit('idle');});
+    // Keep external overlays (cat heads and labels) in step with AMap's
+    // animated pan/zoom instead of waiting for the end events.
+    const syncMove=()=>{
+      if(this.moveFrame)return;
+      this.moveFrame=requestAnimationFrame(()=>{this.moveFrame=0;if(!this.destroyed)this.emit('move');});
+    };
+    this.map.on('mapmove',syncMove);
+    this.map.on('zoomchange',syncMove);
     this.map.on('resize',()=>this.emit('resize'));
     await new Promise((resolve,reject)=>{let done=false;const finish=(fn)=>{if(done)return;done=true;fn();};const timer=setTimeout(()=>finish(()=>reject(new Error('AMAP_TIMEOUT：高德地图加载超时，请检查 Key 的域名白名单和安全密钥配置。'))),20000);this.map.on('complete',()=>{clearTimeout(timer);finish(resolve);});this.map.on('error',e=>{clearTimeout(timer);finish(()=>reject(new Error(`AMAP_ERROR：${e?.type||'地图加载失败'}。`)));});});
     this.emit('ready');return this;
@@ -68,5 +76,5 @@ export class AMapStreetMap {
   zoomIn(){this.map?.zoomIn();return this;}
   zoomOut(){this.map?.zoomOut();return this;}
   retry(){this.map?.render();}
-  remove(){this.destroyed=true;this.life.abort();this.listeners.clear();this.map?.destroy();this.map=null;this.container.replaceChildren();this.container.classList.remove('amap-street-map');}
+  remove(){this.destroyed=true;this.life.abort();if(this.moveFrame)cancelAnimationFrame(this.moveFrame);this.moveFrame=0;this.listeners.clear();this.map?.destroy();this.map=null;this.container.replaceChildren();this.container.classList.remove('amap-street-map');}
 }
