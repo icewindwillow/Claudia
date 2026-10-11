@@ -58,7 +58,7 @@ class OverviewMap{
     this.clip.replaceChildren(clipFrag);
     const [west,south,east,north]=next==='city'?CITY_BOUNDS:MAP_BOUNDS;
     const top=project([west,north])[1],bottom=project([west,south])[1];
-    const art=document.createElementNS(svgNS,'image');art.classList.add('map-art',next==='city'?'urban-map-art':'regional-map-art');art.setAttribute('href',next==='city'?'./assets/maps/chongqing-urban-fb043-v1.webp':'./assets/maps/chongqing-overview-fb019-v1.webp');art.setAttribute('x',String(west));art.setAttribute('y',String(top));art.setAttribute('width',String(east-west));art.setAttribute('height',String(bottom-top));art.setAttribute('preserveAspectRatio','none');art.setAttribute('clip-path','url(#chongqing-art-clip)');
+    const art=document.createElementNS(svgNS,'image');art.classList.add('map-art',next==='city'?'urban-map-art':'regional-map-art');art.setAttribute('href',next==='city'?'./assets/maps/chongqing-urban-fb043-v1.webp':'./assets/maps/chongqing-overview-fb043-v1.webp');art.setAttribute('x',String(west));art.setAttribute('y',String(top));art.setAttribute('width',String(east-west));art.setAttribute('height',String(bottom-top));art.setAttribute('preserveAspectRatio','none');art.setAttribute('clip-path','url(#chongqing-art-clip)');
     const frag=document.createDocumentFragment();
     frag.append(art);
     for(const f of features){const p=document.createElementNS(svgNS,'path');p.setAttribute('d',featurePath(f));p.setAttribute('class',next==='city'?'coast-city-boundary':`coast-${f.properties.kind}`);frag.append(p);}
